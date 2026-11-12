@@ -3,6 +3,7 @@ import { parseMoneyToCents, platformFeeCents } from "@/lib/money";
 import { safeNext } from "@/lib/safe-redirect";
 import { buildCsp } from "@/lib/csp";
 import { claimSchema, feisSchema, listingSchema, searchTerm, signUpSchema } from "@/lib/validation";
+import { findRegion, regionMatches } from "@/lib/idtana-regions";
 
 describe("platform fee", () => {
   it("is 7% rounded to the nearest cent", () => {
@@ -84,5 +85,29 @@ describe("form validation", () => {
     const base = { claimantTitle: "Owner", contactEmail: "a@b.co", evidence: "We are on the website." };
     expect(claimSchema.safeParse(base).success).toBe(false);
     expect(claimSchema.safeParse({ ...base, proposedName: "Scoil Rince" }).success).toBe(true);
+  });
+});
+
+describe("IDTANA region filter", () => {
+  it("matches a state by full name or abbreviation, case-insensitively", () => {
+    expect(regionMatches("Pennsylvania", "mid-atlantic")).toBe(true);
+    expect(regionMatches("PA", "mid-atlantic")).toBe(true);
+    expect(regionMatches("pa", "mid-atlantic")).toBe(true);
+    expect(regionMatches("Ohio", "mid-america")).toBe(true);
+    expect(regionMatches("Ontario", "eastern-canada")).toBe(true);
+  });
+  it("does not match a state from another region", () => {
+    expect(regionMatches("Pennsylvania", "southern")).toBe(false);
+    expect(regionMatches("Texas", "mid-atlantic")).toBe(false);
+  });
+  it("does not match empty or unknown values", () => {
+    expect(regionMatches(null, "southern")).toBe(false);
+    expect(regionMatches("", "southern")).toBe(false);
+    expect(regionMatches("Paris", "western-us")).toBe(false);
+  });
+  it("finds regions by slug only", () => {
+    expect(findRegion("western-us")?.label).toBe("Western US");
+    expect(findRegion("nowhere")).toBeUndefined();
+    expect(findRegion(undefined)).toBeUndefined();
   });
 });
