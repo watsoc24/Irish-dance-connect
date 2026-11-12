@@ -25,6 +25,14 @@ export default async function SchoolPage({ params }: PageProps<"/schools/[slug]"
       <div>
         <h1 className="text-2xl font-bold">{school.name}</h1>
         <p className="text-gray-600">{[school.city, school.region, school.country].filter(Boolean).join(", ")}</p>
+        {school.street_address ? (
+          <p className="text-gray-600">
+            {[school.street_address, school.postal_code].filter(Boolean).join(" ")}
+            {school.geo_precision === "city" ? " (approximate location)" : ""}
+          </p>
+        ) : school.geo_precision === "city" ? (
+          <p className="text-gray-600">Location is approximate (city-level only).</p>
+        ) : null}
         {school.status === "verified" ? (
           <span className="badge mt-2 bg-brand-50 text-brand-700">Verified by the school</span>
         ) : (

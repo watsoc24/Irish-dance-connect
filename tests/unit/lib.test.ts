@@ -4,6 +4,7 @@ import { safeNext } from "@/lib/safe-redirect";
 import { buildCsp } from "@/lib/csp";
 import { claimSchema, feisSchema, listingSchema, searchTerm, signUpSchema } from "@/lib/validation";
 import { findRegion, regionMatches } from "@/lib/idtana-regions";
+import { formatMiles, haversineMiles, isValidZip, normalizeZip, sortSchoolsByDistance } from "@/lib/geo";
 
 describe("platform fee", () => {
   it("is 7% rounded to the nearest cent", () => {
@@ -109,5 +110,78 @@ describe("IDTANA region filter", () => {
     expect(findRegion("western-us")?.label).toBe("Western US");
     expect(findRegion("nowhere")).toBeUndefined();
     expect(findRegion(undefined)).toBeUndefined();
+  });
+});
+
+describe("ZIP codes", () => {
+  it("accepts exactly five digits", () => {
+    expect(isValidZip("45226")).toBe(true);
+    expect(isValidZip("02127")).toBe(true);
+    expect(normalizeZip("45226")).toBe("45226");
+    expect(normalizeZip("  45226  ")).toBe("45226");
+  });
+  it("rejects anything that is not a 5-digit ZIP", () => {
+    for (const bad of ["4522", "452266", "4522a", "ABCDE", "45 226", "", "45226-123", null, undefined, 45226]) {
+      expect(isValidZip(bad)).toBe(false);
+      expect(normalizeZip(bad)).toBeNull();
+    }
+  });
+  it("normalizes ZIP+4 to the 5-digit ZIP", () => {
+    expect(normalizeZip("45226-1234")).toBe("45226");
+    expect(isValidZip("45226-1234")).toBe(false);
+  });
+});
+
+describe("Haversine distance", () => {
+  it("is zero for the same point", () => {
+    expect(haversineMiles({ latitude: 41, longitude: -81 }, { latitude: 41, longitude: -81 })).toBe(0);
+  });
+  it("is about 69.1 miles per degree of latitude", () => {
+    expect(haversineMiles({ latitude: 0, longitude: 0 }, { latitude: 1, longitude: 0 })).toBeCloseTo(69.1, 1);
+  });
+  it("matches known city pairs", () => {
+    // Cincinnati -> Dayton, straight-line
+    expect(
+      haversineMiles({ latitude: 39.1031, longitude: -84.512 }, { latitude: 39.7589, longitude: -84.1916 }),
+    ).toBeCloseTo(48.4, 1);
+    // New York -> Los Angeles, straight-line
+    expect(
+      haversineMiles({ latitude: 40.7128, longitude: -74.006 }, { latitude: 34.0522, longitude: -118.2437 }),
+    ).toBeCloseTo(2445.7, 0);
+  });
+  it("is symmetric", () => {
+    const a = { latitude: 39.1, longitude: -84.5 };
+    const b = { latitude: 41.5, longitude: -81.7 };
+    expect(haversineMiles(a, b)).toBeCloseTo(haversineMiles(b, a), 10);
+  });
+  it("formats to one decimal place", () => {
+    expect(formatMiles(12.345)).toBe("12.3");
+    expect(formatMiles(0)).toBe("0.0");
+  });
+});
+
+describe("nearest-first school sort", () => {
+  const origin = { latitude: 39.1031, longitude: -84.512 }; // Cincinnati
+  const schools = [
+    { name: "Far Away", latitude: 41.5, longitude: -81.7 },
+    { name: "No Coordinates", latitude: null, longitude: null },
+    { name: "Nearby", latitude: 39.2, longitude: -84.4 },
+    { name: "Also No Coordinates", latitude: null, longitude: null },
+  ];
+  it("sorts geocoded schools nearest-first and ungeocoded schools last", () => {
+    const sorted = sortSchoolsByDistance(schools, origin);
+    expect(sorted.map((r) => r.school.name)).toEqual([
+      "Nearby",
+      "Far Away",
+      "Also No Coordinates",
+      "No Coordinates",
+    ]);
+    expect(sorted[0].distanceMiles).toBeGreaterThan(0);
+    expect(sorted[0].distanceMiles).toBeLessThan(sorted[1].distanceMiles!);
+    expect(sorted[2].distanceMiles).toBeNull();
+    expect(sorted[3].distanceMiles).toBeNull();
+  });
+  it("returns an empty list for no schools", () => {
+    expect(sortSchoolsByDistance([], origin)).toEqual([]);
   });
 });
