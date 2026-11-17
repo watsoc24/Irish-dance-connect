@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { COUNTRIES, MAX_SHIPPING_CENTS, MIN_PRICE_CENTS, MAX_PRICE_CENTS, parseMoneyToCents } from "@/lib/money";
+import { DANCES, LEVELS } from "@/lib/practice-music";
 
 // Strips control characters (keeps newlines/tabs) and trims.
 const clean = (s: string) => s.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "").trim();
@@ -113,6 +114,15 @@ export const categoryLabel = (v: string) => CATEGORIES.find(([k]) => k === v)?.[
 export const conditionLabel = (v: string) => CONDITIONS.find(([k]) => k === v)?.[1] ?? v;
 export const levelLabel = (v: string | null) => DANCE_LEVELS.find(([k]) => k === v)?.[1] ?? "—";
 
+/**
+ * Practice-music dance/level pairs (spec §1 Part D), derived from the
+ * single source of truth in src/lib/practice-music.ts (DANCES / LEVELS).
+ */
+export const CHOREOGRAPHY_DANCES = DANCES.map((d) => [d.slug, d.name] as const);
+export const CHOREOGRAPHY_LEVELS = LEVELS.map((l) => [l.slug, l.name] as const);
+export const choreographyDanceLabel = (v: string) => CHOREOGRAPHY_DANCES.find(([k]) => k === v)?.[1] ?? v;
+export const choreographyLevelLabel = (v: string) => CHOREOGRAPHY_LEVELS.find(([k]) => k === v)?.[1] ?? v;
+
 const money = (label: string, min: number, max: number) =>
   z
     .string()
@@ -179,6 +189,19 @@ export const schoolEditSchema = z.object({
 });
 
 export const adminSchoolSchema = schoolEditSchema.extend({ name: text("Name", 2, 120) });
+
+/** Staff-only school choreography item. isPublished comes from a checkbox ("yes" when ticked). */
+export const choreographySchema = z.object({
+  title: text("Title", 2, 120),
+  dance: z.enum(CHOREOGRAPHY_DANCES.map(([v]) => v) as [string, ...string[]], { error: "Choose a dance." }),
+  level: z.enum(CHOREOGRAPHY_LEVELS.map(([v]) => v) as [string, ...string[]], { error: "Choose a level." }),
+  notes: optionalText("Notes", 2000),
+  videoUrl: optionalHttpsUrl("Video link"),
+  isPublished: z
+    .string()
+    .optional()
+    .transform((s) => s === "yes"),
+});
 
 const isoDate = z.iso.date({ error: "Enter a valid date." });
 export const feisSchema = z

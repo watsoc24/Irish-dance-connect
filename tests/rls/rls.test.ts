@@ -44,6 +44,7 @@ const ids = {
   feisPublished: randomUUID(),
   feisPending: randomUUID(),
   report: randomUUID(),
+  choreoX: randomUUID(),
 };
 const photoPathA = `${u.parentA}/${ids.listingA}/${randomUUID()}.jpg`;
 const photoPathRemoved = `${u.parentB}/${ids.listingRemoved}/${randomUUID()}.jpg`;
@@ -115,6 +116,11 @@ beforeAll(async () => {
       ids.schoolX,
       u.schoolAdmin,
     ]);
+    await setup.query(
+      `insert into public.school_choreography (id, school_id, created_by, title, dance, level)
+       values ($1, $2, $3, 'Reel steps', 'reel', 'beginner')`,
+      [ids.choreoX, ids.schoolX, u.schoolAdmin],
+    );
     await setup.query(
       `insert into public.children (id, parent_id, nickname, birth_year) values
         ($1, $2, 'ChildOfA', 2016), ($3, $4, 'ChildOfB', 2015)`,
@@ -645,6 +651,69 @@ describe("feis calendar", () => {
       q("update public.feis_events set status = 'published' where id = $1 returning id", [ids.feisPending]),
     );
     expect(rows).toEqual([]);
+  });
+});
+
+describe("school choreography (staff-only)", () => {
+  it("anonymous visitors cannot read any choreography", async () => {
+    await expect(as("anon", (q) => q("select * from public.school_choreography"))).rejects.toThrow(DENIED);
+  });
+
+  it("parents and admins of other schools see no choreography", async () => {
+    expect(await as({ id: u.parentA }, (q) => q("select id from public.school_choreography"))).toEqual([]);
+    expect(await as({ id: u.claimant }, (q) => q("select id from public.school_choreography"))).toEqual([]);
+    expect(
+      await as({ id: u.schoolAdmin }, (q) =>
+        q("select id from public.school_choreography where school_id = $1", [ids.schoolY]),
+      ),
+    ).toEqual([]);
+  });
+
+  it("the owning school's admin can read its choreography", async () => {
+    const rows = await as({ id: u.schoolAdmin }, (q) => q("select id from public.school_choreography"));
+    expect(rows.map((r) => r.id)).toEqual([ids.choreoX]);
+  });
+
+  it("non-admins cannot insert, update or delete choreography", async () => {
+    await expect(
+      as({ id: u.parentA }, (q) =>
+        q(
+          `insert into public.school_choreography (school_id, title, dance, level)
+           values ($1, 'Sneaky', 'reel', 'beginner')`,
+          [ids.schoolX],
+        ),
+      ),
+    ).rejects.toThrow(DENIED);
+    await as({ id: u.parentA }, async (q) => {
+      expect(await q("update public.school_choreography set title = 'x' where id = $1 returning id", [ids.choreoX])).toEqual([]);
+      expect(await q("delete from public.school_choreography where id = $1 returning id", [ids.choreoX])).toEqual([]);
+    });
+  });
+
+  it("an admin cannot add choreography for a school they do not manage", async () => {
+    await expect(
+      as({ id: u.schoolAdmin }, (q) =>
+        q(
+          `insert into public.school_choreography (school_id, title, dance, level)
+           values ($1, 'Other school', 'reel', 'beginner')`,
+          [ids.schoolY],
+        ),
+      ),
+    ).rejects.toThrow(DENIED);
+  });
+
+  it("the owning school's admin can add, edit and delete its choreography", async () => {
+    await as({ id: u.schoolAdmin }, async (q) => {
+      const inserted = await q(
+        `insert into public.school_choreography (school_id, title, dance, level)
+         values ($1, 'Light jig steps', 'light-jig', 'novice') returning id`,
+        [ids.schoolX],
+      );
+      expect(inserted).toHaveLength(1);
+      const newId = inserted[0].id;
+      expect(await q("update public.school_choreography set title = 'Light jig steps 2' where id = $1 returning id", [newId])).toHaveLength(1);
+      expect(await q("delete from public.school_choreography where id = $1 returning id", [newId])).toHaveLength(1);
+    });
   });
 });
 

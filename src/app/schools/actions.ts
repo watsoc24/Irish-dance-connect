@@ -6,7 +6,7 @@ import { requireSchoolAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { rateLimit, RATE_LIMITED } from "@/lib/rate-limit";
 import { dbError, validationError, type FormState } from "@/lib/form";
-import { claimSchema, formObject, schoolEditSchema, uuidSchema } from "@/lib/validation";
+import { choreographySchema, claimSchema, formObject, schoolEditSchema, uuidSchema } from "@/lib/validation";
 
 export async function submitClaim(_: FormState, formData: FormData): Promise<FormState> {
   const account = await requireSchoolAdmin("/schools/claim");
@@ -56,4 +56,81 @@ export async function updateSchool(schoolId: string, _: FormState, formData: For
   if (!data?.length) return { error: "You don't manage this school." };
   revalidatePath(`/schools/${data[0].slug}`);
   return { ok: true, message: "Saved." };
+}
+
+export async function addChoreography(schoolId: string, _: FormState, formData: FormData): Promise<FormState> {
+  const account = await requireSchoolAdmin("/schools/manage");
+  if (!uuidSchema.safeParse(schoolId).success) return { error: "Not found." };
+  const parsed = choreographySchema.safeParse(formObject(formData));
+  if (!parsed.success) return validationError(parsed.error);
+  if (!(await rateLimit("school-choreography", 10, 3600, account.id))) return RATE_LIMITED;
+  const d = parsed.data;
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("school_choreography")
+    .insert({
+      school_id: schoolId,
+      created_by: account.id,
+      title: d.title,
+      dance: d.dance,
+      level: d.level,
+      notes: d.notes,
+      video_url: d.videoUrl,
+      is_published: d.isPublished,
+    })
+    .select("id");
+  if (error) return dbError(error);
+  if (!data?.length) return { error: "You don't manage this school." };
+  revalidatePath("/schools/manage");
+  return { ok: true, message: "Choreography added." };
+}
+
+export async function updateChoreography(
+  schoolId: string,
+  itemId: string,
+  _: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const account = await requireSchoolAdmin("/schools/manage");
+  if (!uuidSchema.safeParse(schoolId).success || !uuidSchema.safeParse(itemId).success)
+    return { error: "Not found." };
+  const parsed = choreographySchema.safeParse(formObject(formData));
+  if (!parsed.success) return validationError(parsed.error);
+  if (!(await rateLimit("school-choreography", 10, 3600, account.id))) return RATE_LIMITED;
+  const d = parsed.data;
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("school_choreography")
+    .update({
+      title: d.title,
+      dance: d.dance,
+      level: d.level,
+      notes: d.notes,
+      video_url: d.videoUrl,
+      is_published: d.isPublished,
+    })
+    .eq("id", itemId)
+    .eq("school_id", schoolId)
+    .select("id");
+  if (error) return dbError(error);
+  if (!data?.length) return { error: "You don't manage this school." };
+  revalidatePath("/schools/manage");
+  return { ok: true, message: "Saved." };
+}
+
+export async function deleteChoreography(schoolId: string, itemId: string): Promise<FormState> {
+  await requireSchoolAdmin("/schools/manage");
+  if (!uuidSchema.safeParse(schoolId).success || !uuidSchema.safeParse(itemId).success)
+    return { error: "Not found." };
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("school_choreography")
+    .delete()
+    .eq("id", itemId)
+    .eq("school_id", schoolId)
+    .select("id");
+  if (error) return dbError(error);
+  if (!data?.length) return { error: "You don't manage this school." };
+  revalidatePath("/schools/manage");
+  return { ok: true, message: "Deleted." };
 }
