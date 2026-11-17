@@ -3,6 +3,8 @@ import { requireUser } from "@/lib/auth";
 import { ActionForm } from "@/components/action-form";
 import { ListingFields } from "../listing-fields";
 import { createListing } from "../actions";
+import { env } from "@/lib/env";
+import { MarketplaceComingSoon } from "@/components/marketplace-coming-soon";
 
 export const metadata = { title: "Sell an item" };
 
@@ -11,6 +13,7 @@ export default async function NewListingPage() {
   return (
     <div className="mx-auto max-w-md space-y-4">
       <h1 className="page-title">Sell an item</h1>
+      {!env.stripeConfigured ? <MarketplaceComingSoon /> : null}
       <p className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
         Photos must show only the item — on a hanger, mannequin or flat. No photos of dancers or any people. See{" "}
         <Link href="/safety" className="link">

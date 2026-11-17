@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { env } from "@/lib/env";
 
 export default async function Home({ searchParams }: PageProps<"/">) {
   const { notice } = await searchParams;
@@ -12,6 +13,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
       href: "/marketplace",
       title: "Dress & gear marketplace",
       body: "Buy and sell solo dresses, shoes, wigs and more with other dance families. Secure checkout through Stripe.",
+      badge: !env.stripeConfigured ? "Coming soon" : null,
     },
     {
       href: "/schools",
@@ -45,7 +47,10 @@ export default async function Home({ searchParams }: PageProps<"/">) {
         {sections.map((s) => (
           <li key={s.href}>
             <Link href={s.href} className="card block">
-              <h2 className="text-lg font-semibold">{s.title}</h2>
+              <h2 className="flex items-center gap-2 text-lg font-semibold">
+                {s.title}
+                {"badge" in s && s.badge ? <span className="badge bg-brand-100 text-brand-900">{s.badge}</span> : null}
+              </h2>
               <p className="text-gray-600">{s.body}</p>
             </Link>
           </li>

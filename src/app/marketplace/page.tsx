@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { signedPhotoUrls } from "@/lib/photos";
 import { CATEGORIES, categoryLabel, conditionLabel, searchTerm } from "@/lib/validation";
 import { formatMoney } from "@/lib/money";
+import { env } from "@/lib/env";
+import { MarketplaceComingSoon } from "@/components/marketplace-coming-soon";
 
 export const metadata = { title: "Marketplace" };
 
@@ -39,6 +41,7 @@ export default async function MarketplacePage({ searchParams }: PageProps<"/mark
           Sell
         </Link>
       </div>
+      {!env.stripeConfigured ? <MarketplaceComingSoon /> : null}
       <form className="flex gap-2" role="search">
         <input name="q" defaultValue={q} placeholder="Search titles" className="input" maxLength={60} aria-label="Search titles" />
         <select name="category" defaultValue={category} className="input max-w-40" aria-label="Category">
