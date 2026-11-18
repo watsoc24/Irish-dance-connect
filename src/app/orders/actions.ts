@@ -91,7 +91,8 @@ export async function buyListing(listingId: string): Promise<FormState> {
     await admin.from("orders").update({ stripe_checkout_session_id: session.id }).eq("id", order.id);
     url = session.url;
   } catch (e) {
-    console.error("checkout create failed", (e as { code?: string }).code);
+    const err = e as { code?: string; message?: string };
+    console.error("checkout create failed", err.code, err.message);
     await admin.from("orders").update({ status: "cancelled" }).eq("id", order.id);
   }
   if (!url) return { error: "Couldn't start checkout. Please try again." };

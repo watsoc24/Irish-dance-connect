@@ -32,17 +32,23 @@ export async function startPayoutOnboarding(_: FormState, formData: FormData): P
     if (!accountId) {
       const country = String(formData.get("country") ?? "");
       if (!COUNTRIES.some((c) => c.code === country)) return { error: "Choose your country." };
-      const created = await stripe().accounts.create(
+      // Accounts v2 (POST /v2/core/accounts): Stripe no longer allows new
+      // Connect integrations to create accounts with the v1 API. The values
+      // below are the v2 equivalents of the old v1 controller settings:
+      // full dashboard; Stripe collects its processing fees directly from
+      // the seller (so the application fee stays exactly our 7%); Stripe —
+      // not the platform — is liable for negative balances; and because
+      // losses sit with Stripe, Stripe also collects KYC requirements.
+      const created = await stripe().v2.core.accounts.create(
         {
-          country,
-          email: account.email ?? undefined,
-          // Seller has their own full Stripe dashboard, pays Stripe's processing
-          // fees, and Stripe (not the platform) covers negative balances.
-          controller: {
-            stripe_dashboard: { type: "full" },
-            fees: { payer: "account" },
-            losses: { payments: "stripe" },
-            requirement_collection: "stripe",
+          contact_email: account.email ?? undefined,
+          identity: { country: country.toLowerCase() },
+          dashboard: "full",
+          defaults: {
+            responsibilities: { fees_collector: "stripe", losses_collector: "stripe" },
+          },
+          configuration: {
+            merchant: { capabilities: { card_payments: { requested: true } } },
           },
           metadata: { user_id: account.id },
         },
@@ -52,15 +58,23 @@ export async function startPayoutOnboarding(_: FormState, formData: FormData): P
       const { error } = await admin.from("seller_accounts").insert({ user_id: account.id, stripe_account_id: accountId });
       if (error) return { error: "Couldn't save your payout account. Please try again." };
     }
-    const link = await stripe().accountLinks.create({
+    // Account Links v2 (POST /v2/core/account_links), Stripe-hosted onboarding.
+    const link = await stripe().v2.core.accountLinks.create({
       account: accountId,
-      type: "account_onboarding",
-      refresh_url: `${env.siteUrl}/sell/payouts`,
-      return_url: `${env.siteUrl}/sell/payouts/return`,
+      use_case: {
+        type: "account_onboarding",
+        account_onboarding: {
+          // Collect everything up front, as the v1 hosted flow did.
+          collection_options: { fields: "eventually_due" },
+          refresh_url: `${env.siteUrl}/sell/payouts`,
+          return_url: `${env.siteUrl}/sell/payouts/return`,
+        },
+      },
     });
     onboardingUrl = link.url;
   } catch (e) {
-    console.error("onboarding failed", (e as { code?: string }).code);
+    const err = e as { code?: string; message?: string };
+    console.error("onboarding failed", err.code, err.message);
     return { error: "Stripe couldn't start onboarding. Please try again." };
   }
   redirect(onboardingUrl);
