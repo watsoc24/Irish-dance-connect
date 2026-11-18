@@ -1,8 +1,30 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
+import { Cormorant_Garamond, IBM_Plex_Mono, Public_Sans } from "next/font/google";
 import "./globals.css";
 import { getAccount } from "@/lib/auth";
 import { BottomNav } from "@/components/bottom-nav";
+
+const publicSans = Public_Sans({
+  subsets: ["latin"],
+  variable: "--font-public-sans",
+  display: "swap",
+});
+
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["600", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-cormorant",
+  display: "swap",
+});
+
+const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-plex-mono",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: { default: "Irish Dance Connect", template: "%s · Irish Dance Connect" },
@@ -14,7 +36,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0b7a45",
+  themeColor: "#0A5C36",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -23,11 +45,11 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const account = await getAccount();
   return (
-    <html lang="en" className="h-full antialiased">
-      <body className="flex min-h-full flex-col">
-        <header className="sticky top-0 z-20 border-b border-gray-200 bg-white/95 pt-[env(safe-area-inset-top)] backdrop-blur">
+    <html lang="en" className={`h-full antialiased ${publicSans.variable} ${cormorant.variable} ${plexMono.variable}`}>
+      <body className="flex min-h-full flex-col font-sans">
+        <header className="sticky top-0 z-20 border-b border-line bg-cream pt-[env(safe-area-inset-top)]">
           <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-3">
-            <Link href="/" className="text-lg font-bold text-brand-700">
+            <Link href="/" className="font-display text-[22px] leading-none font-bold text-brand-700">
               Irish Dance Connect
             </Link>
             <nav className="hidden gap-4 text-sm font-medium sm:flex">
@@ -48,9 +70,15 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
               </Link>
             )}
           </div>
+          <div className="knot-strip" aria-hidden="true" />
         </header>
         <main className="mx-auto w-full max-w-3xl flex-1 px-4 pt-6 pb-28 sm:pb-10">{children}</main>
-        <footer className="mx-auto mb-24 w-full max-w-3xl px-4 py-6 text-sm text-gray-500 sm:mb-0">
+        <div className="knot-strip" aria-hidden="true" />
+        <footer className="mx-auto mb-24 w-full max-w-3xl px-4 py-6 text-sm text-muted sm:mb-0">
+          <p className="mb-3">
+            Irish Dance Connect — feis calendar, school directory, and a dress &amp; gear marketplace. Run by a dance
+            family in Ohio.
+          </p>
           <div className="flex flex-wrap gap-4">
             <Link href="/privacy">Privacy</Link>
             <Link href="/terms">Terms</Link>

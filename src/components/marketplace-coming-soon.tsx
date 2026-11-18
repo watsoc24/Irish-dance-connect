@@ -6,7 +6,7 @@ import Link from "next/link";
 // calendar and the school directory — stay fully usable throughout.
 export function MarketplaceComingSoon() {
   return (
-    <section className="rounded-2xl bg-brand-50 p-4" aria-label="Marketplace coming soon">
+    <section className="rounded-xl border border-line bg-brand-50 p-4" aria-label="Marketplace coming soon">
       <p className="mb-1 flex items-center gap-2 font-semibold text-brand-900">
         The marketplace is opening soon
         <span className="badge bg-brand-100 text-brand-900">Coming soon</span>

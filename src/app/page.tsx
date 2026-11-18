@@ -24,40 +24,44 @@ export default async function Home({ searchParams }: PageProps<"/">) {
   return (
     <div className="space-y-6">
       {notice === "account-deleted" ? (
-        <p role="status" className="rounded-xl bg-brand-50 p-3 text-sm text-brand-900">
+        <p role="status" className="rounded-lg bg-brand-50 p-3 text-sm text-brand-900">
           Your account and its data have been deleted.
         </p>
       ) : null}
-      <section className="rounded-3xl bg-brand-700 p-6 text-white">
-        <h1 className="text-3xl font-bold">The Irish dance world, in one place</h1>
-        <p className="mt-2 text-white/90">
+      <section className="double-rule">
+        <p className="kicker">Feis calendar · 810 schools · Marketplace</p>
+        <h1 className="mt-2 font-display text-[40px] leading-[1.1] font-bold text-ink">
+          The Irish dance world, in one place
+        </h1>
+        <p className="mt-3 max-w-xl text-ink/80">
           For dance parents and schools: find feiseanna, find schools, and pass on dresses and gear your dancer has
           outgrown.
         </p>
-        <div className="mt-4 flex gap-2">
-          <Link href="/signup" className="inline-flex min-h-11 items-center rounded-xl bg-white px-4 font-semibold text-brand-700">
+        <div className="mt-5 flex flex-wrap gap-2 pb-2">
+          <Link href="/signup" className="btn">
             Create free account
           </Link>
-          <Link href="/feis" className="inline-flex min-h-11 items-center rounded-xl border border-white/60 px-4 font-semibold">
+          <Link href="/feis" className="btn-secondary">
             Browse feiseanna
           </Link>
         </div>
       </section>
       <ul className="space-y-3">
-        {sections.map((s) => (
+        {sections.map((s, i) => (
           <li key={s.href}>
             <Link href={s.href} className="card block">
               <h2 className="flex items-center gap-2 text-lg font-semibold">
+                <span className="font-mono text-sm font-medium text-brand-700">{String(i + 1).padStart(2, "0")} —</span>
                 {s.title}
                 {"badge" in s && s.badge ? <span className="badge bg-brand-100 text-brand-900">{s.badge}</span> : null}
               </h2>
-              <p className="text-gray-600">{s.body}</p>
+              <p className="text-muted">{s.body}</p>
             </Link>
           </li>
         ))}
       </ul>
-      <section className="card text-sm text-gray-700">
-        <h2 className="mb-1 font-semibold">Built with dancers&apos; privacy in mind</h2>
+      <section className="card text-sm text-ink/80">
+        <h2 className="mb-1 font-semibold text-ink">Built with dancers&apos; privacy in mind</h2>
         <p>
           Only parents and school staff have accounts. Dancer details stay private to their parent, and we never
           show children&apos;s names or photos publicly.

@@ -17,7 +17,7 @@ export function BottomNav({ signedIn }: { signedIn: boolean }) {
   const path = usePathname();
   const visible = items.filter((i) => !i.auth || signedIn);
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-gray-200 bg-white pb-[env(safe-area-inset-bottom)] sm:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-cream pb-[env(safe-area-inset-bottom)] sm:hidden">
       <ul className="flex">
         {visible.map((i) => {
           const active = path === i.href || path.startsWith(`${i.href}/`);
@@ -25,7 +25,7 @@ export function BottomNav({ signedIn }: { signedIn: boolean }) {
             <li key={i.href} className="flex-1">
               <Link
                 href={i.href}
-                className={`flex min-h-14 items-center justify-center text-xs font-semibold ${active ? "text-brand-700" : "text-gray-500"}`}
+                className={`flex min-h-14 items-center justify-center text-xs font-semibold ${active ? "text-brand-700" : "text-muted"}`}
                 aria-current={active ? "page" : undefined}
               >
                 {i.label}

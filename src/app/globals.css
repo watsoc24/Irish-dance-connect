@@ -1,12 +1,28 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-50: #ecfdf3;
-  --color-brand-100: #d1fadf;
-  --color-brand-600: #0b7a45;
-  --color-brand-700: #086438;
-  --color-brand-900: #053321;
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --color-brand-50: #eff6ec;
+  --color-brand-100: #dcebd9;
+  --color-brand-600: #0a5c36;
+  --color-brand-700: #084c2d;
+  --color-brand-900: #063a22;
+  --color-paper: #faf5ea;
+  --color-cream: #fffdf7;
+  --color-ink: #1b2420;
+  --color-gold: #b97f06;
+  --color-line: #e3dcc8;
+  --color-muted: #5f6b62;
+}
+
+/* Font tokens are wired to the next/font CSS variables set in layout.tsx
+   (--font-public-sans, --font-cormorant, --font-plex-mono). `@theme inline`
+   makes Tailwind resolve those variables at use time instead of inlining
+   them into :root before the font classes are applied. */
+@theme inline {
+  --font-sans: var(--font-public-sans), "Public Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-display: var(--font-cormorant), "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --font-mono: var(--font-plex-mono), "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
 :root {
@@ -14,41 +30,82 @@
 }
 
 body {
-  background: #f8faf9;
-  color: #1c2622;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  line-height: 1.55;
   -webkit-tap-highlight-color: transparent;
 }
 
 @layer components {
   .card {
-    @apply rounded-2xl border border-gray-200 bg-white p-4 shadow-sm;
+    @apply rounded-xl border border-line bg-cream p-4;
   }
   .btn {
-    @apply inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-600 px-4 py-2 font-semibold text-white hover:bg-brand-700 disabled:opacity-60;
+    @apply inline-flex min-h-11 items-center justify-center rounded-lg bg-brand-600 px-4 py-2 font-semibold text-white hover:bg-brand-700 disabled:opacity-60;
   }
   .btn-secondary {
-    @apply inline-flex min-h-11 items-center justify-center rounded-xl border border-gray-300 bg-white px-4 py-2 font-semibold text-gray-800 hover:bg-gray-50 disabled:opacity-60;
+    @apply inline-flex min-h-11 items-center justify-center rounded-lg border border-line bg-cream px-4 py-2 font-semibold text-ink hover:bg-brand-50 disabled:opacity-60;
   }
   .btn-danger {
-    @apply inline-flex min-h-11 items-center justify-center rounded-xl bg-red-600 px-4 py-2 font-semibold text-white hover:bg-red-700 disabled:opacity-60;
+    @apply inline-flex min-h-11 items-center justify-center rounded-lg bg-red-600 px-4 py-2 font-semibold text-white hover:bg-red-700 disabled:opacity-60;
   }
   .label {
-    @apply mb-1 block text-sm font-medium text-gray-700;
+    @apply mb-1 block text-sm font-medium text-ink;
   }
   /* 16px text stops iPhone Safari from zooming into inputs */
   .input {
-    @apply block min-h-11 w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-base focus:border-brand-600 focus:ring-2 focus:ring-brand-100 focus:outline-none;
+    @apply block min-h-11 w-full rounded-lg border border-line bg-cream px-3 py-2 text-base text-ink focus:border-brand-600 focus:ring-2 focus:ring-brand-100 focus:outline-none;
   }
   .hint {
-    @apply mt-1 text-sm text-gray-500;
+    @apply mt-1 text-sm text-muted;
   }
+  /* Double rule (3px emerald + 1px gold) under the title — a nod to dress trim. */
   .page-title {
-    @apply mb-4 text-2xl font-bold text-gray-900;
+    @apply mb-5 font-display text-[32px] leading-[1.1] font-bold text-ink;
+    padding-bottom: 10px;
+    background-image:
+      linear-gradient(var(--color-brand-600), var(--color-brand-600)),
+      linear-gradient(var(--color-gold), var(--color-gold));
+    background-size:
+      100% 3px,
+      100% 1px;
+    background-position:
+      left 0 bottom 4px,
+      left 0 bottom 0;
+    background-repeat: no-repeat;
+  }
+  .double-rule {
+    padding-bottom: 10px;
+    background-image:
+      linear-gradient(var(--color-brand-600), var(--color-brand-600)),
+      linear-gradient(var(--color-gold), var(--color-gold));
+    background-size:
+      100% 3px,
+      100% 1px;
+    background-position:
+      left 0 bottom 4px,
+      left 0 bottom 0;
+    background-repeat: no-repeat;
+  }
+  .kicker {
+    @apply font-mono text-xs font-medium tracking-[0.08em] text-brand-700 uppercase;
   }
   .link {
     @apply font-medium text-brand-700 underline underline-offset-2;
   }
   .badge {
-    @apply inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700;
+    @apply inline-flex items-center rounded-md bg-brand-100 px-2 py-0.5 font-mono text-xs font-medium text-brand-900;
+  }
+  /* Knot strip: a thin repeating diamond-trellis band in emerald + gold
+     hairlines (SVG line pattern, no imagery). Used under the header and
+     above the footer. */
+  .knot-strip {
+    height: 14px;
+    background-color: var(--color-paper);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='14' viewBox='0 0 24 14'%3E%3Cpath d='M12 1 L23 7 L12 13 L1 7 Z' fill='none' stroke='%230A5C36' stroke-width='1'/%3E%3Cpath d='M12 4 L16 7 L12 10 L8 7 Z' fill='none' stroke='%23B97F06' stroke-width='0.75'/%3E%3C/svg%3E");
+    background-repeat: repeat-x;
+    background-position: center;
+    background-size: 24px 14px;
   }
 }

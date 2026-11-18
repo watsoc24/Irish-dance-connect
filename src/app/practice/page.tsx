@@ -43,8 +43,8 @@ export default async function PracticePage({ searchParams }: PageProps<"/practic
                 aria-current={l.slug === level ? "true" : undefined}
                 className={
                   l.slug === level
-                    ? "inline-flex min-h-11 items-center rounded-xl bg-brand-600 px-3 py-2 text-sm font-semibold text-white"
-                    : "inline-flex min-h-11 items-center rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-800"
+                    ? "inline-flex min-h-11 items-center rounded-lg bg-brand-600 px-3 py-2 text-sm font-semibold text-white"
+                    : "inline-flex min-h-11 items-center rounded-lg border border-line bg-cream px-3 py-2 text-sm font-semibold text-ink"
                 }
               >
                 {l.name}
@@ -148,7 +148,7 @@ export default async function PracticePage({ searchParams }: PageProps<"/practic
         </p>
       </section>
 
-      <section className="rounded-2xl bg-brand-50 p-4" aria-label="Premium practice tracks coming soon">
+      <section className="rounded-xl border border-line bg-brand-50 p-4" aria-label="Premium practice tracks coming soon">
         <p className="mb-1 flex items-center gap-2 font-semibold text-brand-900">
           Premium practice tracks
           <span className="badge bg-brand-100 text-brand-900">Coming soon</span>
