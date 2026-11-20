@@ -179,6 +179,16 @@ export function Metronome({ initialDance, initialLevel, initialBpm }: MetronomeP
   }, [scheduleClick, stop]);
 
   const start = async () => {
+    // iOS Safari: route web audio through the media ("playback") channel
+    // where the Audio Session API exists — otherwise the phone's silent
+    // switch mutes the click even at full volume.
+    try {
+      const session = (navigator as unknown as { audioSession?: { type: string } }).audioSession;
+      if (session) session.type = "playback";
+    } catch {
+      // Older browsers have no audioSession; the hint under the controls
+      // covers the silent-switch case there.
+    }
     // Create/resume the AudioContext here, inside the tap — never on load.
     if (!ctxRef.current) {
       const Ctor =
@@ -188,7 +198,19 @@ export function Metronome({ initialDance, initialLevel, initialBpm }: MetronomeP
       ctxRef.current = new Ctor();
     }
     const ctx = ctxRef.current;
-    if (ctx.state === "suspended") await ctx.resume();
+    // Unlock inside the gesture itself: rendering a silent buffer right
+    // now is what convinces iOS the context is user-started. Resuming
+    // alone can leave the context stuck suspended (currentTime frozen at
+    // 0, clicks scheduled but never heard).
+    try {
+      const unlock = ctx.createBufferSource();
+      unlock.buffer = ctx.createBuffer(1, 1, ctx.sampleRate);
+      unlock.connect(ctx.destination);
+      unlock.start(0);
+    } catch {
+      // If the unlock fails the resume below is still worth trying.
+    }
+    if (ctx.state !== "running") await ctx.resume();
     if (timerRef.current !== null) window.clearInterval(timerRef.current);
     visualTimersRef.current.forEach((id) => window.clearTimeout(id));
     visualTimersRef.current = [];
@@ -201,6 +223,7 @@ export function Metronome({ initialDance, initialLevel, initialBpm }: MetronomeP
     setCurrentBar(0);
     nextNoteTimeRef.current = ctx.currentTime + 0.06;
     timerRef.current = window.setInterval(tick, 25);
+    tick();
     setRunning(true);
   };
 
@@ -348,6 +371,10 @@ export function Metronome({ initialDance, initialLevel, initialBpm }: MetronomeP
           Tap tempo
         </button>
       </div>
+      <p className="text-xs text-gray-500">
+        No sound? On iPhone, Safari can silence web audio while the phone&apos;s silent switch is on — flip silent
+        mode off and turn the volume up, then tap Start again.
+      </p>
 
       <div>
         <label className="label" htmlFor="metro-bpm">

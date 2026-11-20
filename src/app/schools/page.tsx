@@ -27,11 +27,15 @@ export default async function SchoolsPage({ searchParams }: PageProps<"/schools"
   const zip = normalizeZip(rawZip);
 
   const supabase = await createClient();
+  // Fetch the whole directory (810 rows and growing slowly): the ZIP sort
+  // below must rank every school, not just an alphabetical first slice —
+  // with a 200-row limit the nearest schools often never loaded at all.
+  // Display is capped after sorting, in the render.
   let query = supabase
     .from("schools")
     .select("id, name, slug, city, region, country, status, street_address, postal_code, latitude, longitude, geo_precision")
     .order("name")
-    .limit(200);
+    .limit(1000);
   if (q) query = query.or(`name.ilike."%${q}%",city.ilike."%${q}%",region.ilike."%${q}%"`);
   const { data } = await query;
   const schools = (data ?? []) as SchoolRow[];
@@ -60,6 +64,11 @@ export default async function SchoolsPage({ searchParams }: PageProps<"/schools"
       }
     }
   }
+
+  // Cap what's rendered, AFTER any distance sort, so a ZIP search shows
+  // the 200 nearest rather than the first 200 alphabetically.
+  const displayRows = rows.slice(0, 200);
+  const truncated = rows.length > displayRows.length;
 
   return (
     <div className="space-y-4">
@@ -93,12 +102,15 @@ export default async function SchoolsPage({ searchParams }: PageProps<"/schools"
       ) : null}
       {located ? (
         <p role="status" className="text-sm text-gray-600">
-          Nearest schools to {located.city ? `${located.city}, ${located.state} ` : ""}{located.zip}, nearest first.
+          {truncated ? "Showing the 200 nearest schools to " : "Nearest schools to "}
+          {located.city ? `${located.city}, ${located.state} ` : ""}
+          {located.zip}
+          {truncated ? "." : ", nearest first."}
         </p>
       ) : null}
-      {rows.length ? (
+      {displayRows.length ? (
         <ul className="space-y-2">
-          {rows.map(({ school: s, distanceMiles }) => (
+          {displayRows.map(({ school: s, distanceMiles }) => (
             <li key={s.id}>
               <Link href={`/schools/${s.slug}`} className="card flex items-center justify-between gap-2">
                 <span>
