@@ -57,10 +57,15 @@ export default async function FeisPage({ searchParams }: PageProps<"/feis">) {
         </p>
       ) : null}
       <p className="text-sm text-gray-600">
-        Listings are curated from Planxti, the IDTANA regional calendars, FeisWeb and QuickFeis.
         Registration happens on each organizer&apos;s own site. Tap a feis to register there. Dates and
         details can change, so always confirm on the organizer&apos;s site.
       </p>
+      <Link href="/feis/calculator" className="card block space-y-1">
+        <span className="font-semibold">Stage time calculator</span>
+        <span className="block text-sm text-gray-600">
+          Find out when your dancer is likely to be on, from the stage start time and the running order.
+        </span>
+      </Link>
       <form className="space-y-2" role="search">
         <input
           name="q"
