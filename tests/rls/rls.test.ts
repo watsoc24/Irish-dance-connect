@@ -45,6 +45,11 @@ const ids = {
   feisPending: randomUUID(),
   report: randomUUID(),
   choreoX: randomUUID(),
+  questionA: randomUUID(),
+  questionHidden: randomUUID(),
+  replyA: randomUUID(),
+  replyB: randomUUID(),
+  replyHidden: randomUUID(),
 };
 const photoPathA = `${u.parentA}/${ids.listingA}/${randomUUID()}.jpg`;
 const photoPathRemoved = `${u.parentB}/${ids.listingRemoved}/${randomUUID()}.jpg`;
@@ -171,6 +176,19 @@ beforeAll(async () => {
     await setup.query(
       `insert into public.reports (id, reporter_id, target_type, target_id, reason) values ($1, $2, 'listing', $3, 'Photo shows a child')`,
       [ids.report, u.parentA, ids.listingRemoved],
+    );
+    await setup.query(
+      `insert into public.parent_questions (id, author_id, title, body, category, is_hidden) values
+        ($1, $2, 'First feis morning?', 'What time should we arrive for our very first feis?', 'feis-day', false),
+        ($3, $2, 'Hidden question', 'This question was hidden by a platform admin.', 'other', true)`,
+      [ids.questionA, u.parentA, ids.questionHidden],
+    );
+    await setup.query(
+      `insert into public.parent_replies (id, question_id, author_id, body) values
+        ($1, $2, $3, 'We arrive an hour early and settle in.'),
+        ($4, $2, $5, 'Same here, and bring snacks for the wait.'),
+        ($6, $7, $3, 'A reply on the hidden question.')`,
+      [ids.replyA, ids.questionA, u.parentB, ids.replyB, u.parentA, ids.replyHidden, ids.questionHidden],
     );
   } finally {
     setup.release();
@@ -713,6 +731,128 @@ describe("school choreography (staff-only)", () => {
       const newId = inserted[0].id;
       expect(await q("update public.school_choreography set title = 'Light jig steps 2' where id = $1 returning id", [newId])).toHaveLength(1);
       expect(await q("delete from public.school_choreography where id = $1 returning id", [newId])).toHaveLength(1);
+    });
+  });
+});
+
+describe("parent questions and replies (Ask a Parent)", () => {
+  it("anonymous visitors can read visible questions and replies, but not hidden ones", async () => {
+    const questions = await as("anon", (q) => q("select id from public.parent_questions"));
+    expect(questions.map((r) => r.id)).toEqual([ids.questionA]);
+    const replies = await as("anon", (q) => q("select id from public.parent_replies"));
+    expect(replies.map((r) => r.id).sort()).toEqual([ids.replyA, ids.replyB].sort());
+  });
+
+  it("anonymous visitors cannot post questions or replies", async () => {
+    await expect(
+      as("anon", (q) =>
+        q(
+          `insert into public.parent_questions (title, body, category)
+           values ('Sneaky question', 'Posted without an account at all.', 'other')`,
+        ),
+      ),
+    ).rejects.toThrow(DENIED);
+    await expect(
+      as("anon", (q) => q(`insert into public.parent_replies (question_id, body) values ($1, 'Anon reply')`, [ids.questionA])),
+    ).rejects.toThrow(DENIED);
+  });
+
+  it("a parent can ask a question and reply to one, always as themselves", async () => {
+    await as({ id: u.parentB }, async (q) => {
+      const inserted = await q(
+        `insert into public.parent_questions (title, body, category)
+         values ('How tight should ghillies fit?', 'Buying our first pair this week.', 'dresses-and-gear') returning id, author_id`,
+      );
+      expect(inserted).toHaveLength(1);
+      expect(inserted[0].author_id).toBe(u.parentB);
+      const reply = await q(
+        `insert into public.parent_replies (question_id, body) values ($1, 'Snug — they stretch a lot.') returning id`,
+        [ids.questionA],
+      );
+      expect(reply).toHaveLength(1);
+    });
+    await expect(
+      as({ id: u.parentB }, (q) =>
+        q(
+          `insert into public.parent_questions (author_id, title, body, category)
+           values ($1, 'Posting as someone else', 'This should never be allowed through.', 'other')`,
+          [u.parentA],
+        ),
+      ),
+    ).rejects.toThrow(DENIED);
+  });
+
+  it("authors can see their own hidden questions; other parents cannot", async () => {
+    const own = await as({ id: u.parentA }, (q) =>
+      q("select id from public.parent_questions where id = $1", [ids.questionHidden]),
+    );
+    expect(own).toHaveLength(1);
+    expect(
+      await as({ id: u.parentB }, (q) => q("select id from public.parent_questions where id = $1", [ids.questionHidden])),
+    ).toEqual([]);
+    // A hidden question's replies disappear with it — even for the reply's
+    // own author — while the question's author can still see the thread.
+    expect(
+      await as({ id: u.parentB }, (q) =>
+        q("select id from public.parent_replies where question_id = $1", [ids.questionHidden]),
+      ),
+    ).toEqual([]);
+    const thread = await as({ id: u.parentA }, (q) =>
+      q("select id from public.parent_replies where question_id = $1", [ids.questionHidden]),
+    );
+    expect(thread.map((r) => r.id)).toEqual([ids.replyHidden]);
+  });
+
+  it("nobody can reply to a hidden question", async () => {
+    await expect(
+      as({ id: u.parentB }, (q) =>
+        q(`insert into public.parent_replies (question_id, body) values ($1, 'Reply to a hidden thread')`, [
+          ids.questionHidden,
+        ]),
+      ),
+    ).rejects.toThrow(DENIED);
+  });
+
+  it("non-authors cannot update or delete other parents' posts", async () => {
+    await as({ id: u.parentB }, async (q) => {
+      expect(
+        await q("update public.parent_questions set title = 'Hijacked title' where id = $1 returning id", [ids.questionA]),
+      ).toEqual([]);
+      expect(await q("delete from public.parent_questions where id = $1 returning id", [ids.questionA])).toEqual([]);
+      expect(await q("delete from public.parent_replies where id = $1 returning id", [ids.replyB])).toEqual([]);
+    });
+  });
+
+  it("an author can delete their own question, and its replies go with it", async () => {
+    await as({ id: u.parentB }, async (q) => {
+      const mine = await q(
+        `insert into public.parent_questions (title, body, category)
+         values ('Do we need a wig for a first feis?', 'Trying to keep costs down this year.', 'dresses-and-gear') returning id`,
+      );
+      const myQuestion = mine[0].id;
+      await q(`insert into public.parent_replies (question_id, body) values ($1, 'Not at beginner level.')`, [myQuestion]);
+      expect(await q("delete from public.parent_questions where id = $1 returning id", [myQuestion])).toHaveLength(1);
+      expect(await q("select id from public.parent_replies where question_id = $1", [myQuestion])).toEqual([]);
+    });
+  });
+
+  it("a reply author can delete their own reply", async () => {
+    await as({ id: u.parentB }, async (q) => {
+      expect(await q("delete from public.parent_replies where id = $1 returning id", [ids.replyA])).toHaveLength(1);
+    });
+  });
+
+  it("platform admins need MFA (aal2) to hide or delete posts; with it they can", async () => {
+    await as({ id: u.platformAdmin, aal: "aal1" }, async (q) => {
+      expect(
+        await q("update public.parent_questions set is_hidden = true where id = $1 returning id", [ids.questionA]),
+      ).toEqual([]);
+    });
+    await as({ id: u.platformAdmin, aal: "aal2" }, async (q) => {
+      expect(
+        await q("update public.parent_questions set is_hidden = true where id = $1 returning id", [ids.questionA]),
+      ).toHaveLength(1);
+      expect(await q("delete from public.parent_replies where id = $1 returning id", [ids.replyA])).toHaveLength(1);
     });
   });
 });

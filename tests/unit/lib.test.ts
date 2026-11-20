@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 import { parseMoneyToCents, platformFeeCents } from "@/lib/money";
 import { safeNext } from "@/lib/safe-redirect";
 import { buildCsp } from "@/lib/csp";
-import { claimSchema, feisSchema, listingSchema, searchTerm, signUpSchema } from "@/lib/validation";
+import { claimSchema, feisSchema, listingSchema, questionSchema, replySchema, searchTerm, signUpSchema } from "@/lib/validation";
+import { QUESTION_CATEGORIES } from "@/lib/parent-questions";
 import { findRegion, regionMatches } from "@/lib/idtana-regions";
 import { formatMiles, haversineMiles, isValidZip, normalizeZip, sortSchoolsByDistance } from "@/lib/geo";
 
@@ -183,5 +184,40 @@ describe("nearest-first school sort", () => {
   });
   it("returns an empty list for no schools", () => {
     expect(sortSchoolsByDistance([], origin)).toEqual([]);
+  });
+});
+
+describe("parent question validation", () => {
+  const base = {
+    title: "First feis morning?",
+    body: "What time should we arrive for our very first feis?",
+    category: "feis-day",
+  };
+  it("accepts a well-formed question in every category", () => {
+    for (const [slug] of QUESTION_CATEGORIES) {
+      expect(questionSchema.safeParse({ ...base, category: slug }).success).toBe(true);
+    }
+  });
+  it("trims whitespace before measuring length", () => {
+    const ok = questionSchema.safeParse({ ...base, title: "  First feis morning?  " });
+    expect(ok.success && ok.data.title).toBe("First feis morning?");
+    expect(questionSchema.safeParse({ ...base, title: "  ab  " }).success).toBe(false);
+  });
+  it("enforces title and body bounds matching the database checks", () => {
+    expect(questionSchema.safeParse({ ...base, title: "Four" }).success).toBe(false);
+    expect(questionSchema.safeParse({ ...base, title: "x".repeat(141) }).success).toBe(false);
+    expect(questionSchema.safeParse({ ...base, body: "too short" }).success).toBe(false);
+    expect(questionSchema.safeParse({ ...base, body: "x".repeat(4001) }).success).toBe(false);
+    expect(questionSchema.safeParse({ ...base, body: "x".repeat(4000) }).success).toBe(true);
+  });
+  it("rejects unknown categories", () => {
+    expect(questionSchema.safeParse({ ...base, category: "selling" }).success).toBe(false);
+    expect(questionSchema.safeParse({ ...base, category: "" }).success).toBe(false);
+  });
+  it("validates replies: any non-empty body up to 4000 characters", () => {
+    expect(replySchema.safeParse({ body: "We arrive an hour early." }).success).toBe(true);
+    expect(replySchema.safeParse({ body: "   " }).success).toBe(false);
+    expect(replySchema.safeParse({ body: "" }).success).toBe(false);
+    expect(replySchema.safeParse({ body: "x".repeat(4001) }).success).toBe(false);
   });
 });

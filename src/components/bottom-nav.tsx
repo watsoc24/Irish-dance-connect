@@ -7,6 +7,7 @@ const items = [
   { href: "/feis", label: "Feiseanna" },
   { href: "/schools", label: "Schools" },
   { href: "/practice", label: "Practice" },
+  { href: "/parents", label: "Parents" },
   { href: "/marketplace", label: "Market" },
   { href: "/messages", label: "Messages", auth: true },
   { href: "/account", label: "Account", auth: true },

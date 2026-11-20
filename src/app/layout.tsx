@@ -56,6 +56,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
               <Link href="/feis">Feis calendar</Link>
               <Link href="/schools">Schools</Link>
               <Link href="/practice">Practice</Link>
+              <Link href="/parents">Parents</Link>
               <Link href="/marketplace">Marketplace</Link>
               {account ? <Link href="/messages">Messages</Link> : null}
               {account?.isPlatformAdmin ? <Link href="/admin">Admin</Link> : null}

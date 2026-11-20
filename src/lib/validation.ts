@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { COUNTRIES, MAX_SHIPPING_CENTS, MIN_PRICE_CENTS, MAX_PRICE_CENTS, parseMoneyToCents } from "@/lib/money";
 import { DANCES, LEVELS } from "@/lib/practice-music";
+import { QUESTION_CATEGORIES } from "@/lib/parent-questions";
 
 // Strips control characters (keeps newlines/tabs) and trims.
 const clean = (s: string) => s.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "").trim();
@@ -225,6 +226,19 @@ export const reportSchema = z.object({
   targetType: z.enum(["listing", "message", "school", "feis_event"]),
   targetId: uuid,
   reason: text("Reason", 5, 1000),
+});
+
+/** Parents' Q&A board ("Ask a Parent") — bounds mirror the DB checks. */
+export const questionSchema = z.object({
+  title: text("Title", 5, 140),
+  body: text("Question", 10, 4000),
+  category: z.enum(QUESTION_CATEGORIES.map(([v]) => v) as [string, ...string[]], {
+    error: "Choose a category.",
+  }),
+});
+
+export const replySchema = z.object({
+  body: text("Reply", 1, 4000),
 });
 
 export const reviewNoteSchema = optionalText("Note", 500);

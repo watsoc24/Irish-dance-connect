@@ -20,6 +20,11 @@ export default async function Home({ searchParams }: PageProps<"/">) {
       title: "School directory",
       body: "Find Irish dance schools near you. Verified badges mean the school itself has confirmed its listing.",
     },
+    {
+      href: "/parents",
+      title: "Ask a Parent",
+      body: "New to all this? Ask the parents who've done it — first feiseanna, dress fittings, practice routines and more.",
+    },
   ];
   return (
     <div className="space-y-6">
