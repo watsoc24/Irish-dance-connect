@@ -1,10 +1,16 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getAccount } from "@/lib/auth";
 import { searchTerm } from "@/lib/validation";
 import { PARENT_GUIDELINES, QUESTION_CATEGORIES, questionCategoryLabel } from "@/lib/parent-questions";
 
-export const metadata = { title: "Ask a Parent" };
+export const metadata: Metadata = {
+  title: "Ask a Parent: Advice for Irish Dance Families",
+  description:
+    "Questions and answers from Irish dance parents who have been there: first feiseanna, solo dresses and fittings, practice routines, schools and teachers, and competition day. Ask your own question.",
+  alternates: { canonical: "/parents" },
+};
 
 type QuestionRow = {
   id: string;

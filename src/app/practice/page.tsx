@@ -1,8 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Metronome } from "@/components/metronome";
 import { getDance, getLevel, LEVELS, PRACTICE_ENTRIES, SOFTLEY_ARTIST_URL, TEMPO_CHART } from "@/lib/practice-music";
 
-export const metadata = { title: "Practice music" };
+export const metadata: Metadata = {
+  title: "Irish Dance Practice Music & Feis Tempos",
+  description:
+    "Free Irish dance practice music at official feis tempos for every dance and level, with a built-in metronome, tap tempo, slow-down practice and the traditional set dance speeds. No sign-in needed.",
+  alternates: { canonical: "/practice" },
+};
 
 // Free practice-music directory + metronome. No sign-in required, no
 // audio hosted; listening is always an outbound link. Initial state

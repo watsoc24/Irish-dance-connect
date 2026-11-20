@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -7,7 +8,12 @@ import { formatMoney } from "@/lib/money";
 import { env } from "@/lib/env";
 import { MarketplaceComingSoon } from "@/components/marketplace-coming-soon";
 
-export const metadata = { title: "Marketplace" };
+export const metadata: Metadata = {
+  title: "Used Irish Dance Dresses & Gear Marketplace",
+  description:
+    "Buy and sell used Irish dance solo dresses, wigs, shoes and gear with other dance families. Every listing shows size, condition, location and photos, with secure checkout through Stripe.",
+  alternates: { canonical: "/marketplace" },
+};
 
 const PAGE_SIZE = 24;
 
@@ -65,7 +71,7 @@ export default async function MarketplacePage({ searchParams }: PageProps<"/mark
                   <div className="aspect-square bg-gray-100">
                     {photo && urls[photo] ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={urls[photo]} alt="" className="h-full w-full object-cover" loading="lazy" />
+                      <img src={urls[photo]} alt={l.title} className="h-full w-full object-cover" loading="lazy" />
                     ) : (
                       <div className="flex h-full items-center justify-center text-sm text-gray-400">No photo</div>
                     )}

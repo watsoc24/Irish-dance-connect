@@ -1,10 +1,17 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getAccount } from "@/lib/auth";
 import { searchTerm } from "@/lib/validation";
 import { IDTANA_REGIONS, findRegion, regionMatches } from "@/lib/idtana-regions";
+import { JsonLd } from "@/components/json-ld";
 
-export const metadata = { title: "Feis calendar" };
+export const metadata: Metadata = {
+  title: "Feis Calendar: Upcoming Irish Dance Competitions",
+  description:
+    "Browse upcoming feiseanna and Irish dance competitions across the United States and Canada, with dates, venues and a direct link to each organizer's official registration page. Updated weekly.",
+  alternates: { canonical: "/feis" },
+};
 
 function formatRange(start: string, end: string) {
   const opts: Intl.DateTimeFormatOptions = { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" };
@@ -48,8 +55,48 @@ export default async function FeisPage({ searchParams }: PageProps<"/feis">) {
   const events = region ? (data ?? []).filter((e) => regionMatches(e.region, region)) : (data ?? []);
   const hasFilter = Boolean(q || region || from);
 
+  // Structured data for the unfiltered calendar only: an ItemList of the
+  // upcoming Events exactly as stored, with the organizer's registration
+  // page as each event's URL (feis events have no detail page here).
+  const eventsJsonLd =
+    !hasFilter && events.length
+      ? {
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          name: "Upcoming feiseanna",
+          itemListElement: events.map((e, i) => ({
+            "@type": "ListItem",
+            position: i + 1,
+            item: {
+              "@type": "Event",
+              name: e.name,
+              startDate: e.starts_on,
+              endDate: e.ends_on,
+              eventStatus: "https://schema.org/EventScheduled",
+              eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+              ...(e.venue_name || e.city
+                ? {
+                    location: {
+                      "@type": "Place",
+                      ...(e.venue_name ? { name: e.venue_name } : {}),
+                      address: {
+                        "@type": "PostalAddress",
+                        ...(e.city ? { addressLocality: e.city } : {}),
+                        ...(e.region ? { addressRegion: e.region } : {}),
+                        ...(e.country ? { addressCountry: e.country } : {}),
+                      },
+                    },
+                  }
+                : {}),
+              url: e.registration_url,
+            },
+          })),
+        }
+      : null;
+
   return (
     <div className="space-y-4">
+      {eventsJsonLd ? <JsonLd data={eventsJsonLd} /> : null}
       <h1 className="page-title">Feis calendar</h1>
       {sp.submitted ? (
         <p role="status" className="rounded-xl bg-brand-50 p-3 text-sm text-brand-900">

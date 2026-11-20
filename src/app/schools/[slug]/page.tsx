@@ -1,8 +1,31 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { JsonLd } from "@/components/json-ld";
 
-export const metadata = { title: "School" };
+function placeOf(school: { city: string | null; region: string | null; country: string | null }): string {
+  return [school.city, school.region, school.country].filter(Boolean).join(", ");
+}
+
+export async function generateMetadata({ params }: PageProps<"/schools/[slug]">): Promise<Metadata> {
+  const { slug } = await params;
+  if (!/^[a-z0-9-]{1,140}$/.test(slug)) return { title: "School" };
+  const supabase = await createClient();
+  const { data: school } = await supabase
+    .from("schools")
+    .select("name, city, region, country, description")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (!school) return { title: "School" };
+  const place = placeOf(school);
+  const fallback = `${school.name} is an Irish dance school${place ? ` in ${place}` : ""}. See its location, website, contact details and hosted feiseanna on Irish Dance Connect.`;
+  return {
+    title: place ? `${school.name}, ${school.city ?? school.region ?? school.country}` : school.name,
+    description: school.description ? school.description.slice(0, 300) : fallback,
+    alternates: { canonical: `/schools/${slug}` },
+  };
+}
 
 export default async function SchoolPage({ params }: PageProps<"/schools/[slug]">) {
   const { slug } = await params;
@@ -20,8 +43,34 @@ export default async function SchoolPage({ params }: PageProps<"/schools/[slug]"
     .order("starts_on")
     .limit(20);
 
+  // Structured data from the school's own stored fields only. A street
+  // address is included only when it is a real address, not a city-level
+  // approximation (geo_precision "city").
+  const schoolJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "DanceSchool",
+    name: school.name,
+    ...(school.description ? { description: school.description } : {}),
+    ...(school.website_url ? { url: school.website_url } : {}),
+    ...(school.public_email ? { email: school.public_email } : {}),
+    address: {
+      "@type": "PostalAddress",
+      ...(school.street_address && school.geo_precision !== "city"
+        ? { streetAddress: school.street_address }
+        : {}),
+      ...(school.city ? { addressLocality: school.city } : {}),
+      ...(school.region ? { addressRegion: school.region } : {}),
+      ...(school.postal_code ? { postalCode: school.postal_code } : {}),
+      ...(school.country ? { addressCountry: school.country } : {}),
+    },
+    ...(school.latitude != null && school.longitude != null
+      ? { geo: { "@type": "GeoCoordinates", latitude: school.latitude, longitude: school.longitude } }
+      : {}),
+  };
+
   return (
     <div className="space-y-4">
+      <JsonLd data={schoolJsonLd} />
       <div>
         <h1 className="text-2xl font-bold">{school.name}</h1>
         <p className="text-gray-600">{[school.city, school.region, school.country].filter(Boolean).join(", ")}</p>

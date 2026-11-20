@@ -1,8 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { FeisCalculator, type FeisListing } from "@/components/feis-calculator";
 import { createClient } from "@/lib/supabase/server";
 
-export const metadata = { title: "Feis stage time calculator" };
+export const metadata: Metadata = {
+  title: "Feis Stage Time Calculator",
+  description:
+    "Work out when your dancer will be on stage at a feis. Enter their competition number, the stage start time and the running order to get an estimated stage time and a ready-by time.",
+  alternates: { canonical: "/feis/calculator" },
+};
 
 /**
  * Published, upcoming feiseanna for the calculator's name typeahead.

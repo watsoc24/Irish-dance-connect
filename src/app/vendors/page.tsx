@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { VENDOR_CATEGORIES, VENDORS, findVendorCategory, vendorCategoryName, type Vendor } from "@/lib/vendors";
 
-export const metadata = { title: "Vendor directory" };
+export const metadata: Metadata = {
+  title: "Irish Dance Vendors: Dress Makers, Shoes & Wigs",
+  description:
+    "A directory of Irish dance vendors, each checked against its official website: solo dress makers, shoe brands and retailers, wig specialists and accessory shops in Ireland, the UK and the United States.",
+  alternates: { canonical: "/vendors" },
+};
 
 function VendorCard({ vendor }: { vendor: Vendor }) {
   return (

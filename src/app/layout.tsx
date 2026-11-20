@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
+import { Analytics } from "@vercel/analytics/next";
 import { Cormorant_Garamond, IBM_Plex_Mono, Public_Sans } from "next/font/google";
 import "./globals.css";
+import { SITE_URL } from "@/lib/site";
 import { getAccount } from "@/lib/auth";
 import { BottomNav } from "@/components/bottom-nav";
 
@@ -26,10 +28,29 @@ const plexMono = IBM_Plex_Mono({
   display: "swap",
 });
 
+const SITE_TITLE = "Irish Dance Connect | Feis Calendar, Schools, Dresses & Practice Tools";
+const SITE_DESCRIPTION =
+  "Find upcoming feiseanna on the feis calendar, locate Irish dance schools near you, buy and sell used solo dresses and gear, and practise with free feis tempo music and tools. Built for Irish dance families.";
+
 export const metadata: Metadata = {
-  title: { default: "Irish Dance Connect", template: "%s · Irish Dance Connect" },
-  description: "Feis calendar, school directory and a dress & gear marketplace for Irish dance families.",
+  metadataBase: new URL(SITE_URL),
+  title: { default: SITE_TITLE, template: "%s | Irish Dance Connect" },
+  description: SITE_DESCRIPTION,
   applicationName: "Irish Dance Connect",
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    siteName: "Irish Dance Connect",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    url: "/",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+  },
   appleWebApp: { capable: true, title: "Dance Connect", statusBarStyle: "default" },
   icons: { icon: "/icons/icon-192.png", apple: "/icons/apple-touch-icon.png" },
   robots: { index: true, follow: true },
@@ -88,6 +109,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           </div>
         </footer>
         <BottomNav signedIn={Boolean(account)} />
+        <Analytics />
       </body>
     </html>
   );

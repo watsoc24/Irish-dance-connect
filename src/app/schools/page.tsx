@@ -1,9 +1,15 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { searchTerm } from "@/lib/validation";
 import { formatMiles, lookupZip, normalizeZip, sortSchoolsByDistance } from "@/lib/geo";
 
-export const metadata = { title: "School directory" };
+export const metadata: Metadata = {
+  title: "Find an Irish Dance School Near You",
+  description:
+    "Search over 800 Irish dance schools by name, city or ZIP code and sort by distance from you. See each school's location, website, contact details and the feiseanna it hosts.",
+  alternates: { canonical: "/schools" },
+};
 
 type SchoolRow = {
   id: string;

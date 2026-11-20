@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata = { title: "Become a Featured Vendor" };
+export const metadata: Metadata = {
+  title: "Become a Featured Vendor",
+  description:
+    "Put your Irish dance business in front of the families planning their feis season. Founding Featured Vendors get a highlighted profile in the Irish Dance Connect vendor directory, free through the spring 2027 season.",
+  alternates: { canonical: "/vendors/featured" },
+};
 
 export default function FeaturedVendorPage() {
   return (

@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata = { title: "Fundamentals" };
+export const metadata: Metadata = {
+  title: "Irish Dance Fundamentals: Point, Turn Out, Cross & Arms",
+  description:
+    "The building blocks of Irish dance technique explained for dancers and parents: how to point, turn out, cross and hold your arms, with simple drills and the mistakes to watch for.",
+  alternates: { canonical: "/practice/fundamentals" },
+};
 
 const fundamentals = [
   {

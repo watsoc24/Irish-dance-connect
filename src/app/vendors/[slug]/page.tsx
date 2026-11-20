@@ -10,7 +10,12 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps<"/vendors/[slug]">): Promise<Metadata> {
   const { slug } = await params;
   const vendor = getVendor(slug);
-  return { title: vendor ? vendor.name : "Vendor" };
+  if (!vendor) return { title: "Vendor" };
+  return {
+    title: vendor.name,
+    description: `${vendor.name} (${vendorCategoryName(vendor.category)}, ${vendor.location}): ${vendor.blurb}`,
+    alternates: { canonical: `/vendors/${vendor.slug}` },
+  };
 }
 
 export default async function VendorPage({ params }: PageProps<"/vendors/[slug]">) {

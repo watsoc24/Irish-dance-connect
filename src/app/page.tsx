@@ -1,6 +1,41 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { env } from "@/lib/env";
+import { SITE_URL } from "@/lib/site";
 import { featuredVendors } from "@/lib/vendors";
+import { JsonLd } from "@/components/json-ld";
+
+export const metadata: Metadata = {
+  description:
+    "Find upcoming feiseanna on the feis calendar, locate Irish dance schools near you, buy and sell used solo dresses and gear, and practise with free feis tempo music, a metronome and a stage time calculator.",
+  alternates: { canonical: "/" },
+};
+
+const homeJsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Irish Dance Connect",
+    url: SITE_URL,
+    logo: `${SITE_URL}/icons/icon-512.png`,
+    description:
+      "Feis calendar, school directory, dress and gear marketplace and practice tools for Irish dance families.",
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Irish Dance Connect",
+    url: SITE_URL,
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${SITE_URL}/schools?q={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
+  },
+];
 
 export default async function Home({ searchParams }: PageProps<"/">) {
   const { notice } = await searchParams;
@@ -41,6 +76,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
   ];
   return (
     <div className="space-y-6">
+      <JsonLd data={homeJsonLd} />
       {notice === "account-deleted" ? (
         <p role="status" className="rounded-lg bg-brand-50 p-3 text-sm text-brand-900">
           Your account and its data have been deleted.

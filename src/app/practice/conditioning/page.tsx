@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { CONDITIONING_GROUPS, EXPERT_VIDEOS, TRAINER_LINKS } from "@/lib/conditioning";
 
-export const metadata = { title: "Conditioning & stretching" };
+export const metadata: Metadata = {
+  title: "Conditioning & Stretching for Irish Dancers",
+  description:
+    "Gentle conditioning and stretching routines for Irish dancers: ankles and calves, hips and turnout, core and posture, and balance, plus free videos from recommended Irish dance trainers.",
+  alternates: { canonical: "/practice/conditioning" },
+};
 
 export default function ConditioningPage() {
   return (

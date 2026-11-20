@@ -35,7 +35,7 @@ export default async function ListingPhotosPage({ params }: PageProps<"/marketpl
         {photos.map((p) => (
           <li key={p.id} className="relative">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={urls[p.storage_path]} alt="" className="aspect-square w-full rounded-xl object-cover" />
+            <img src={urls[p.storage_path]} alt={`Photo of ${listing.title}`} className="aspect-square w-full rounded-xl object-cover" />
             <form action={async () => { "use server"; await deleteListingPhoto(p.id); }}>
               <button className="absolute top-1 right-1 rounded-full bg-white/90 px-2 text-sm font-bold text-red-700" aria-label="Delete photo">
                 ✕
