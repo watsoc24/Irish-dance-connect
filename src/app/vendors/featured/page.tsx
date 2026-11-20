@@ -73,16 +73,12 @@ export default function FeaturedVendorPage() {
 
       <section className="card space-y-2" aria-label="How to join">
         <h2 className="text-lg font-semibold">How to join</h2>
-        {/*
-          TODO (site owner): Irish Dance Connect has NO public contact email
-          anywhere in the codebase or on the Privacy page (checked Nov 20,
-          2026). Before outreach is sent, add a public contact email here,
-          and ideally on the Privacy page too, so vendors have a way to
-          reply that isn't the channel the outreach arrived on. Do not ship
-          this page to vendors until this is resolved.
-        */}
         <p>
-          Just reply to the message that brought you here and say you&apos;re in. We&apos;ll build your profile
+          Just reply to the message that brought you here, or email us at{" "}
+          <a href="mailto:hello@irishdanceconnect.com" className="link">
+            hello@irishdanceconnect.com
+          </a>
+          , and say you&apos;re in. We&apos;ll build your profile
           from your website, send it to you for approval before it appears in the directory, and you can ask for
           changes or have it taken down at any time.
         </p>
