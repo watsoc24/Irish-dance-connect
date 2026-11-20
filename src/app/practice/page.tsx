@@ -5,7 +5,7 @@ import { getDance, getLevel, LEVELS, PRACTICE_ENTRIES, SOFTLEY_ARTIST_URL, TEMPO
 export const metadata = { title: "Practice music" };
 
 // Free practice-music directory + metronome. No sign-in required, no
-// audio hosted — listening is always an outbound link. Initial state
+// audio hosted; listening is always an outbound link. Initial state
 // comes from the URL: ?dance=<slug>&level=<slug>&bpm=<60-150>, which is
 // how the fundamentals page pre-selects a tempo. Invalid dance/level
 // values fall back to reel / beginner.
@@ -24,7 +24,7 @@ export default async function PracticePage({ searchParams }: PageProps<"/practic
       <div>
         <h1 className="page-title">Practice music</h1>
         <p className="text-gray-600">
-          Feis tempos, traditional tunes and a metronome for every dance and level — free, no sign-in needed. Pick
+          Feis tempos, traditional tunes and a metronome for every dance and level (free, no sign-in needed). Pick
           your level, choose a dance, and press start.
         </p>
       </div>
@@ -36,7 +36,7 @@ export default async function PracticePage({ searchParams }: PageProps<"/practic
       <section className="card space-y-2" aria-label="Featured practice artist">
         <h2 className="text-lg font-semibold">Recorded at feis tempo</h2>
         <p className="text-sm text-gray-600">
-          Sean Softley&apos;s tracks are recorded at the exact speeds dancers compete at — beginner reels at 122,
+          Sean Softley&apos;s tracks are recorded at the exact speeds dancers compete at: beginner reels at 122,
           championship reels at 113, light jigs at 115, heavy jigs at 73, and the traditional set dances. Where one
           of his tracks matches a dance below, it&apos;s the first listen link.{" "}
           <a href={SOFTLEY_ARTIST_URL} target="_blank" rel="noreferrer" className="link">
@@ -64,11 +64,11 @@ export default async function PracticePage({ searchParams }: PageProps<"/practic
             </li>
           ))}
         </ul>
-        <p className="hint">A dancer advances per dance, not as a whole — your level can differ from dance to dance.</p>
+        <p className="hint">A dancer advances per dance, not as a whole, so your level can differ from dance to dance.</p>
       </section>
 
       <section aria-label="Tempos and tunes for your level">
-        <h2 className="mb-2 text-lg font-semibold">Tempos &amp; tunes — {levelName}</h2>
+        <h2 className="mb-2 text-lg font-semibold">Tempos &amp; tunes: {levelName}</h2>
         <ul className="space-y-3">
           {entries.map((entry) => {
             const danceInfo = getDance(entry.dance);
@@ -148,12 +148,12 @@ export default async function PracticePage({ searchParams }: PageProps<"/practic
           </table>
         </div>
         <p className="mt-2 text-sm text-gray-600">
-          North America (IDTANA) speeds unless stated — confirm with your dancer&apos;s teacher. European speeds
+          North America (IDTANA) speeds unless stated. Confirm with your dancer&apos;s teacher. European speeds
           differ slightly.
         </p>
         <p className="mt-1 text-sm text-gray-600">
           First Feis dancers use beginner speeds, and adult dancers generally use novice speeds. Where the chart
-          shows two speeds (treble jig and hornpipe at Novice and Prizewinner), either may be used — the metronome
+          shows two speeds (treble jig and hornpipe at Novice and Prizewinner), either may be used; the metronome
           above uses 92 at Novice and 73 at Prizewinner for the treble jig, and 138 at Novice and 113 at Prizewinner
           for the hornpipe. Championships add an 8-bar introduction before the 48 bars (Reel, Treble Jig, Treble
           Reel) or 40 bars (Slip Jig, Hornpipe).
@@ -166,7 +166,7 @@ export default async function PracticePage({ searchParams }: PageProps<"/practic
           <Link href="/practice/fundamentals" className="card block space-y-1">
             <h3 className="font-semibold">Fundamentals</h3>
             <p className="text-sm text-gray-600">
-              Point, turn out, cross and arms — the four basics every dancer works on, with a simple drill for each.
+              Point, turn out, cross and arms: the four basics every dancer works on, with a simple drill for each.
             </p>
           </Link>
           <Link href="/practice/conditioning" className="card block space-y-1">
@@ -184,7 +184,7 @@ export default async function PracticePage({ searchParams }: PageProps<"/practic
           <span className="badge bg-brand-100 text-brand-900">Coming soon</span>
         </p>
         <p className="text-sm text-brand-900">
-          Premium practice tracks — coming soon. Full-length tracks at exact feis tempos, coming soon.
+          Premium practice tracks: coming soon. Full-length tracks at exact feis tempos, coming soon.
         </p>
       </section>
     </div>

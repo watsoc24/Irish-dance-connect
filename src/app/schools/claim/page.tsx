@@ -20,7 +20,7 @@ export default async function ClaimPage({ searchParams }: PageProps<"/schools/cl
     <div className="mx-auto max-w-md space-y-4">
       <h1 className="page-title">{school ? `Claim ${school.name}` : "Add your school"}</h1>
       <p className="text-sm text-gray-600">
-        A member of our team checks every claim by hand before you can edit the listing — usually by emailing the
+        A member of our team checks every claim by hand before you can edit the listing, usually by emailing the
         address on your school&apos;s official website or confirming your registration with your governing body.
       </p>
       <div className="card">

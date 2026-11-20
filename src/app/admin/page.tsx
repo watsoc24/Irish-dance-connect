@@ -66,7 +66,7 @@ export default async function AdminPage() {
             <p className="font-semibold">{e.name}</p>
             <p>
               {e.starts_on} → {e.ends_on} · {[e.city, e.region, e.country].filter(Boolean).join(", ")} · host:{" "}
-              {(e.schools as unknown as { name: string } | null)?.name ?? "—"}
+              {(e.schools as unknown as { name: string } | null)?.name ?? "not listed"}
             </p>
             <a href={e.registration_url} target="_blank" rel="noopener noreferrer nofollow" className="link break-all">
               {e.registration_url}

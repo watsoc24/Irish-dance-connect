@@ -58,13 +58,13 @@ const MAX_UPLOAD_BYTES = 2.5 * 1024 * 1024;
 
 /**
  * Receives one photo (already shrunk in the browser), re-encodes it on the
- * server — which strips EXIF/GPS and any other hidden metadata — and stores it.
+ * server, which strips EXIF/GPS and any other hidden metadata, and stores it.
  */
 export async function uploadListingPhoto(listingId: string, formData: FormData): Promise<FormState> {
   const account = await requireUser("/marketplace/mine");
   if (!uuidSchema.safeParse(listingId).success) return { error: "Not found." };
   if (formData.get("attest") !== "yes") {
-    return { error: "Please confirm the photo shows only the item — no people." };
+    return { error: "Please confirm the photo shows only the item, with no people." };
   }
   if (!(await rateLimit("photo-upload", 60, 3600, account.id))) return RATE_LIMITED;
 
@@ -142,5 +142,5 @@ export async function fileReport(_: FormState, formData: FormData): Promise<Form
     reason: parsed.data.reason,
   });
   if (error) return dbError(error);
-  return { ok: true, message: "Thanks — our team will review this." };
+  return { ok: true, message: "Thanks. Our team will review this." };
 }

@@ -11,7 +11,7 @@ export default function SignUpPage() {
       <h1 className="page-title">Create an account</h1>
       <p className="mb-4 text-sm text-gray-600">
         Accounts are for parents, guardians and school staff aged 18 or over. Dancers don&apos;t get their own
-        accounts — parents add them privately.
+        accounts, which parents add privately.
       </p>
       <div className="card">
         <ActionForm action={signUp} submitLabel="Create account" pendingLabel="Creating…">
@@ -21,7 +21,7 @@ export default function SignUpPage() {
             required
             maxLength={60}
             autoComplete="nickname"
-            hint="Shown to people you message. Use your own first name or a nickname — never your child's name."
+            hint="Shown to people you message. Use your own first name or a nickname, never your child's name."
           />
           <TextField label="Email" name="email" type="email" required maxLength={254} autoComplete="email" />
           <TextField

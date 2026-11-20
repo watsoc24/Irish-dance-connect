@@ -28,7 +28,7 @@ export default async function SchoolsPage({ searchParams }: PageProps<"/schools"
 
   const supabase = await createClient();
   // Fetch the whole directory (810 rows and growing slowly): the ZIP sort
-  // below must rank every school, not just an alphabetical first slice —
+  // below must rank every school, not just an alphabetical first slice:
   // with a 200-row limit the nearest schools often never loaded at all.
   // Display is capped after sorting, in the render.
   let query = supabase
@@ -58,7 +58,7 @@ export default async function SchoolsPage({ searchParams }: PageProps<"/schools"
         located = { city: result.place.city, state: result.place.state, zip };
         rows = sortSchoolsByDistance(schools, result.place);
       } else if (result.reason === "not_found") {
-        zipError = `We couldn't find ZIP code ${zip}. Check it and try again — some PO-box-only and very new ZIP codes aren't in the lookup.`;
+        zipError = `We couldn't find ZIP code ${zip}. Check it and try again. Some PO-box-only and very new ZIP codes aren't in the lookup.`;
       } else {
         zipNotice = "We couldn't reach the ZIP lookup just now, so schools are listed alphabetically.";
       }

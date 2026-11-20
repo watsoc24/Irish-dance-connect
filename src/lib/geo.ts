@@ -3,8 +3,8 @@
  * coordinates, and straight-line (Haversine) distances in miles.
  *
  * ZIP lookup uses the free Zippopotam.us API (place data from GeoNames,
- * CC BY). No key, no account. About 4% of US ZIPs — mostly PO-box-only and
- * very new ones — 404 there; callers must handle `not_found` with a clear
+ * CC BY). No key, no account. About 4% of US ZIPs, mostly PO-box-only and
+ * very new ones, 404 there; callers must handle `not_found` with a clear
  * message instead of failing the page.
  *
  * Distances are straight-line ("as the crow flies"), never driving
@@ -68,7 +68,7 @@ export type ZipLookupResult =
  * Resolves a 5-digit US ZIP to coordinates via Zippopotam.us.
  * Returns `not_found` for ZIPs the service has no place for (HTTP 404)
  * and `unavailable` for network/server failures. Results are cached for a
- * day — ZIP centroids do not change.
+ * day. ZIP centroids do not change.
  */
 export async function lookupZip(zip: string): Promise<ZipLookupResult> {
   let res: Response;
@@ -144,7 +144,7 @@ export function sortSchoolsByDistance<T extends { latitude: number | null; longi
   return withDistance;
 }
 
-/** "12.3" — one decimal place, for display next to a school. */
+/** "12.3": one decimal place, for display next to a school. */
 export function formatMiles(miles: number): string {
   return miles.toFixed(1);
 }

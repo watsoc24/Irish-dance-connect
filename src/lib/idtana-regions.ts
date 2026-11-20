@@ -1,7 +1,7 @@
 /**
  * IDTANA regions, used to filter the feis calendar.
  *
- * The `feis_events.region` column stores free text — usually the state or
+ * The `feis_events.region` column stores free text, usually the state or
  * province the submitter typed ("Pennsylvania", "PA", "Ontario", ...).
  * These lists map each IDTANA region to the place names and abbreviations
  * that belong to it, so the filter works whatever form the stored value

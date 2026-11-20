@@ -11,7 +11,7 @@ import { stripe } from "@/lib/stripe";
 
 /**
  * Creates (once) a Stripe connected account for the seller and sends them to
- * Stripe-hosted onboarding. Stripe collects identity and bank details —
+ * Stripe-hosted onboarding. Stripe collects identity and bank details.
  * we never see or store them.
  */
 export async function startPayoutOnboarding(_: FormState, formData: FormData): Promise<FormState> {
@@ -36,8 +36,8 @@ export async function startPayoutOnboarding(_: FormState, formData: FormData): P
       // Connect integrations to create accounts with the v1 API. The values
       // below are the v2 equivalents of the old v1 controller settings:
       // full dashboard; Stripe collects its processing fees directly from
-      // the seller (so the application fee stays exactly our 7%); Stripe —
-      // not the platform — is liable for negative balances; and because
+      // the seller (so the application fee stays exactly our 7%); Stripe,
+      // not the platform, is liable for negative balances; and because
       // losses sit with Stripe, Stripe also collects KYC requirements.
       const created = await stripe().v2.core.accounts.create(
         {

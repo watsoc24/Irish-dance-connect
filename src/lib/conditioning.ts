@@ -1,4 +1,4 @@
-// Content for /practice/conditioning — light, beginner-safe exercises
+// Content for /practice/conditioning: light, beginner-safe exercises
 // and stretches for young Irish dancers.
 //
 // Every exercise below is a generic, common-knowledge movement (calf
@@ -30,28 +30,28 @@ export const CONDITIONING_GROUPS: ConditioningGroup[] = [
     slug: "ankles-calves",
     name: "Ankles & calves",
     intro:
-      "Irish dancers spend so much time up on their toes that strong calves and mobile, steady ankles are the foundation of everything — height in jumps, control in soft shoe, and soft, quiet landings in hard shoe.",
+      "Irish dancers spend so much time up on their toes that strong calves and mobile, steady ankles are the foundation of everything: height in jumps, control in soft shoe, and soft, quiet landings in hard shoe.",
     exercises: [
       {
         name: "Calf raises",
         howTo:
           "Stand tall with your feet hip-width apart, resting your fingertips lightly on a wall or the back of a chair for balance. Press through the balls of your feet to lift your heels as high as is comfortable, pause for a moment at the top, then lower slowly back down.",
         dose: "2 sets of 10, slow and controlled",
-        watchFor: "Keep your ankles straight as you rise — don't let them roll inwards or outwards.",
+        watchFor: "Keep your ankles straight as you rise; don't let them roll inwards or outwards.",
       },
       {
         name: "Single-leg calf raises",
         howTo:
           "Hold a wall or chair and lift one foot slightly off the floor behind you. Using only the standing leg, press through the ball of the foot to raise your heel, pause at the top, and lower slowly. Swap legs after each set.",
         dose: "2 sets of 6–8 on each leg",
-        watchFor: "A little wobble is normal — keep a fingertip on the support so a wobble never becomes a fall.",
+        watchFor: "A little wobble is normal. Keep a fingertip on the support so a wobble never becomes a fall.",
       },
       {
         name: "Ankle circles",
         howTo:
           "Sit down, or stand holding a support, and lift one foot just off the floor. Draw a slow, smooth circle with your toes, as if you were stirring a big pot. Circle in both directions, then swap feet.",
         dose: "5 circles each way, on each foot",
-        watchFor: "Keep the movement in the ankle — your knee and lower leg stay still.",
+        watchFor: "Keep the movement in the ankle; your knee and lower leg stay still.",
       },
       {
         name: "Towel scrunches",
@@ -66,14 +66,14 @@ export const CONDITIONING_GROUPS: ConditioningGroup[] = [
     slug: "hips-turnout",
     name: "Hips & turnout",
     intro:
-      "Turnout is rotation that happens at the hip joint, powered by the deep hip and glute muscles. These exercises wake those muscles up. Never make turnout by twisting your knees or screwing your feet into the floor — that strains joints instead of building strength, and it never lasts.",
+      "Turnout is rotation that happens at the hip joint, powered by the deep hip and glute muscles. These exercises wake those muscles up. Never make turnout by twisting your knees or screwing your feet into the floor. That strains joints instead of building strength, and it never lasts.",
     exercises: [
       {
         name: "Clamshells",
         howTo:
           "Lie on your side with your knees bent and your feet in line with your back, resting your head on your lower arm. Keeping your feet together, lift the top knee open like the cover of a book, only as far as you can go without your hips rolling back. Lower slowly.",
         dose: "2 sets of 8 on each side",
-        watchFor: "Your pelvis stays still — if your whole body rolls backwards, open the knee a little less.",
+        watchFor: "Your pelvis stays still. If your whole body rolls backwards, open the knee a little less.",
       },
       {
         name: "Glute bridges",
@@ -87,14 +87,14 @@ export const CONDITIONING_GROUPS: ConditioningGroup[] = [
         howTo:
           "Stand tall, holding a support. Lift one knee up in front of you to about hip height, then slowly carry the knee out to the side, like opening a gate, and lower the foot back down. Swap legs after each set.",
         dose: "6 on each leg, twice through",
-        watchFor: "Keep your shoulders and standing hip facing forwards — all the movement happens in the lifted leg's hip.",
+        watchFor: "Keep your shoulders and standing hip facing forwards; all the movement happens in the lifted leg's hip.",
       },
       {
         name: "Turnout holds",
         howTo:
-          "Stand with your heels together in a small first position. Gently rotate both legs from the hips so your toes point a little further apart — only as far as your hips can honestly do the work — and hold the position while breathing normally. Release, rest, and repeat.",
+          "Stand with your heels together in a small first position. Gently rotate both legs from the hips so your toes point a little further apart (only as far as your hips can honestly do the work) and hold the position while breathing normally. Release, rest, and repeat.",
         dose: "Hold 10–15 seconds, 4 times",
-        watchFor: "If your knees twist or your feet grip the floor to force a bigger angle, you have gone too far — ease back.",
+        watchFor: "If your knees twist or your feet grip the floor to force a bigger angle, you have gone too far. Ease back.",
       },
     ],
   },
@@ -116,21 +116,21 @@ export const CONDITIONING_GROUPS: ConditioningGroup[] = [
         howTo:
           "Start on your hands and knees with your back flat, like a tabletop. Slide one foot back until that leg is straight behind you while the opposite arm reaches forwards. Hold for a moment, return to the start, and swap sides.",
         dose: "6 on each side, holding 3 seconds each",
-        watchFor: "Imagine balancing a cup of water on your lower back — your hips stay level, with no tipping side to side.",
+        watchFor: "Imagine balancing a cup of water on your lower back: your hips stay level, with no tipping side to side.",
       },
       {
         name: "Front plank",
         howTo:
-          "Lie face down, then prop yourself up on your forearms and your knees — or your toes, if that feels comfortable — so your body forms one straight line from your head to your knees. Pull your tummy in gently and breathe steadily while you hold.",
+          "Lie face down, then prop yourself up on your forearms and your knees (or your toes, if that feels comfortable) so your body forms one straight line from your head to your knees. Pull your tummy in gently and breathe steadily while you hold.",
         dose: "3 holds of 15–20 seconds",
-        watchFor: "Don't let your hips sag or your bottom stick up in the air — a shorter, tidy hold is better than a long, saggy one.",
+        watchFor: "Don't let your hips sag or your bottom stick up in the air. A shorter, tidy hold is better than a long, saggy one.",
       },
       {
         name: "Shoulder blade squeezes",
         howTo:
           "Stand or sit tall with your arms relaxed at your sides. Gently draw your shoulder blades together and slightly down, as if tucking them into your back pockets. Hold for a few seconds, then let go.",
         dose: "2 sets of 8, holding 3 seconds each",
-        watchFor: "The shoulders move down and back — don't shrug them up towards your ears.",
+        watchFor: "The shoulders move down and back; don't shrug them up towards your ears.",
       },
     ],
   },
@@ -145,26 +145,26 @@ export const CONDITIONING_GROUPS: ConditioningGroup[] = [
         howTo:
           "Stand tall near a wall and lift one foot just off the floor, keeping the standing knee soft rather than locked. Fix your eyes on one still spot ahead of you and balance. Swap legs after each hold.",
         dose: "3 holds of 20–30 seconds on each leg",
-        watchFor: "Stay tall through the standing leg — don't sink into the hip or lean your trunk to one side.",
+        watchFor: "Stay tall through the standing leg; don't sink into the hip or lean your trunk to one side.",
       },
       {
         name: "Clock taps",
         howTo:
-          "Balance on one leg. Keeping all your weight on that leg, tap the other foot lightly on the floor in front of you, then out to the side, then behind you — like touching 12, 3 and 6 on a clock face. Come back to the middle between taps.",
+          "Balance on one leg. Keeping all your weight on that leg, tap the other foot lightly on the floor in front of you, then out to the side, then behind you, like touching 12, 3 and 6 on a clock face. Come back to the middle between taps.",
         dose: "4 rounds on each leg",
-        watchFor: "The taps are feather-light — the standing leg does all the work, not the tapping foot.",
+        watchFor: "The taps are feather-light; the standing leg does all the work, not the tapping foot.",
       },
       {
         name: "Tandem walk",
         howTo:
           "Walk slowly along a line on the floor, placing each foot directly in front of the other so the heel of the front foot touches the toes of the foot behind. Take your time, and keep a wall nearby if you need it at first.",
-        dose: "8–10 slow steps forwards, twice — walk back normally",
+        dose: "8–10 slow steps forwards, twice, then walk back normally",
         watchFor: "Look ahead at a fixed point rather than down at your feet.",
       },
       {
         name: "Single-leg mini knee bend",
         howTo:
-          "Holding a support, stand on one leg and bend the standing knee by a small amount — just a few centimetres — keeping the knee pointing over your toes, then straighten again. Move slowly, as if doing a tiny, controlled dip.",
+          "Holding a support, stand on one leg and bend the standing knee by a small amount (just a few centimetres), keeping the knee pointing over your toes, then straighten again. Move slowly, as if doing a tiny, controlled dip.",
         dose: "2 sets of 6 on each leg",
         watchFor: "The knee tracks over the second toe and never caves inwards.",
       },
@@ -174,30 +174,78 @@ export const CONDITIONING_GROUPS: ConditioningGroup[] = [
     slug: "cool-down-stretches",
     name: "Cool-down stretches",
     intro:
-      "Stretch only when your muscles are warm — after class, after practice, or after the exercises above — never on cold muscles. Every stretch should feel like a gentle pull, never pain. Breathe slowly, ease into each one, and never bounce.",
+      "Stretch only when your muscles are warm (after class, after practice, or after the exercises above), never on cold muscles. Every stretch should feel like a gentle pull, never pain. Breathe slowly, ease into each one, and never bounce.",
     exercises: [
       {
         name: "Standing calf stretch",
         howTo:
           "Stand facing a wall with both hands on it. Step one foot back, keeping that leg straight and its heel pressed into the floor, and bend the front knee until you feel a gentle stretch in the back calf. Hold, then swap sides.",
         dose: "20–30 seconds on each side, twice",
-        watchFor: "Keep the back heel down and the toes pointing forwards — if the heel lifts, bring the foot a little closer to the wall.",
+        watchFor: "Keep the back heel down and the toes pointing forwards. If the heel lifts, bring the foot a little closer to the wall.",
       },
       {
         name: "Hamstring stretch",
         howTo:
           "Place one heel on the floor a step in front of you, toes pointing up. Keeping your back flat and your chest lifted, hinge gently forwards from the hips until you feel a stretch down the back of that thigh. Hold, then swap sides.",
         dose: "20–30 seconds on each side, twice",
-        watchFor: "Hinge from the hips with a flat back — don't round your spine or try to force your hands to the floor.",
+        watchFor: "Hinge from the hips with a flat back; don't round your spine or try to force your hands to the floor.",
       },
       {
         name: "Figure-four hip stretch",
         howTo:
           "Lie on your back with both knees bent and feet flat. Cross one ankle over the opposite knee, then gently draw both legs in towards you until you feel a stretch in the hip and glute of the crossed leg. Hold, then swap sides.",
         dose: "20–30 seconds on each side, twice",
-        watchFor: "You should feel a gentle pull in the hip — stop straight away if you feel pinching in the knee.",
+        watchFor: "You should feel a gentle pull in the hip. Stop straight away if you feel pinching in the knee.",
       },
     ],
+  },
+];
+
+export interface ExpertVideo {
+  trainer: string;
+  /** Exact title as it appears on YouTube. */
+  title: string;
+  youtubeId: string;
+  /** One original sentence on what the video covers. */
+  covers: string;
+}
+
+// Free videos from the trainers' own official YouTube channels, played
+// through YouTube's own embed player. Nothing is downloaded or rehosted.
+// Every video below was verified on Nov 20, 2026: Target Training's site
+// (targettrainingdance.com) embeds these same videos on its own blog,
+// and each watch page carries Target Training's branding and links back
+// to that site. The other trainers linked below publish their exercise
+// videos elsewhere (paid libraries or social channels), so they have no
+// verified free YouTube video to embed here.
+export const EXPERT_VIDEOS: ExpertVideo[] = [
+  {
+    trainer: "Target Training",
+    title: "Irish Dance Full Body Workout | 10 Minutes",
+    youtubeId: "JhqeKOyJ-9g",
+    covers:
+      "A ten-minute follow-along workout for the whole body, building core strength, posture, flexibility and mobility along the way.",
+  },
+  {
+    trainer: "Target Training",
+    title: "ONE Exercise to Improve Extension, Turnout, and Crossing for Irish Dance",
+    youtubeId: "AJRLBeodkIo",
+    covers:
+      "One hip-driven exercise, the cross out, that builds the strength behind better turnout, extension and crossover.",
+  },
+  {
+    trainer: "Target Training",
+    title: "Ankle Strength & Mobility",
+    youtubeId: "IeMyX6BAvGs",
+    covers:
+      "Four short exercises, including ankle ABCs and one-leg balance work, that build stronger and steadier ankles.",
+  },
+  {
+    trainer: "Target Training",
+    title: "Ankle Mobility for Irish Dance",
+    youtubeId: "TuT5HswZMRA",
+    covers:
+      "Two quick exercises against a wall that loosen stiff ankles and help keep them moving freely.",
   },
 ];
 
@@ -211,7 +259,7 @@ export interface TrainerLink {
 // Established Irish dance conditioning professionals, linked out to
 // their official sites only. Each URL was fetched and confirmed as the
 // programme's official home on Nov 19, 2026. These are their own paid,
-// professional programmes — nothing of theirs is reproduced here, and
+// professional programmes. Nothing of theirs is reproduced here, and
 // Irish Dance Connect is not affiliated with any of them.
 export const TRAINER_LINKS: TrainerLink[] = [
   {

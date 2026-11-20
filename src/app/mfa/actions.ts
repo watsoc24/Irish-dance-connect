@@ -48,6 +48,6 @@ export async function verifyTotp(_: FormState, formData: FormData): Promise<Form
     factorId: parsed.data.factorId,
     code: parsed.data.code,
   });
-  if (error) return { error: "That code didn't work. Codes change every 30 seconds — try the newest one." };
+  if (error) return { error: "That code didn't work. Codes change every 30 seconds, so try the newest one." };
   redirect(safeNext(parsed.data.next));
 }

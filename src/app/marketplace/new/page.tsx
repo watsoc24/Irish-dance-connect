@@ -15,7 +15,7 @@ export default async function NewListingPage() {
       <h1 className="page-title">Sell an item</h1>
       {!env.stripeConfigured ? <MarketplaceComingSoon /> : null}
       <p className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
-        Photos must show only the item — on a hanger, mannequin or flat. No photos of dancers or any people. See{" "}
+        Photos must show only the item: on a hanger, mannequin or flat. No photos of dancers or any people. See{" "}
         <Link href="/safety" className="link">
           safety tips
         </Link>

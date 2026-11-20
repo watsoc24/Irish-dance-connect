@@ -119,7 +119,7 @@ export default async function ParentsPage({ searchParams }: PageProps<"/parents"
         </ul>
       ) : (
         <p className="card text-gray-600">
-          No questions{hasFilter ? " match your search" : " yet — be the first to ask"}.
+          No questions{hasFilter ? " match your search" : " yet. Be the first to ask"}.
         </p>
       )}
     </div>

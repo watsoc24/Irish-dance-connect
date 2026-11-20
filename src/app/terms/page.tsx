@@ -5,7 +5,7 @@ export default function TermsPage() {
     <article className="space-y-4 text-gray-800">
       <h1 className="page-title">Terms of use</h1>
       <p className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
-        Draft — to be reviewed by a qualified lawyer before public launch.
+        Draft: to be reviewed by a qualified lawyer before public launch.
       </p>
       <ul className="list-disc space-y-2 pl-5">
         <li>You must be 18 or older to create an account.</li>

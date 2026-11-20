@@ -34,7 +34,7 @@ export default async function PayoutsPage() {
         <div className="card space-y-3">
           <p className="text-sm text-gray-700">
             We use Stripe to pay sellers. Stripe will ask for your name, date of birth, address and bank details to
-            verify your identity — we never see these.
+            verify your identity. We never see these.
           </p>
           <ul className="list-disc space-y-1 pl-5 text-sm text-gray-700">
             <li>Platform fee: 7% of each sale (item + shipping).</li>

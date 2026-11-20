@@ -5,7 +5,7 @@ export default function PrivacyPage() {
     <article className="space-y-4 text-gray-800">
       <h1 className="page-title">Privacy notice</h1>
       <p className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
-        Draft — to be reviewed by a qualified lawyer before public launch. It describes how the app is built today.
+        Draft: to be reviewed by a qualified lawyer before public launch. It describes how the app is built today.
       </p>
       <h2 className="font-semibold">Who can have an account</h2>
       <p>Accounts are for adults (18+): parents/guardians and dance school staff. Children cannot create accounts.</p>

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { DANCES, LEVELS, getDance, tempoFor, type DanceSlug, type LevelSlug } from "@/lib/practice-music";
 
 // Dance-driven metronome (spec: specs/practice-music-and-training-v1.md,
-// Part B). The click is generated live with the Web Audio API — no audio
+// Part B). The click is generated live with the Web Audio API. No audio
 // files, no downloads. The AudioContext is created/resumed only inside
 // the Start tap handler, as iPhone Safari requires a user gesture.
 //
@@ -27,7 +27,7 @@ function clampBpm(n: number): number {
 interface MetronomeProps {
   initialDance: DanceSlug;
   initialLevel: LevelSlug;
-  /** Optional ?bpm= override — the starting BPM only, clamped 60–150. */
+  /** Optional ?bpm= override: the starting BPM only, clamped 60–150. */
   initialBpm?: number;
 }
 
@@ -167,7 +167,7 @@ export function Metronome({ initialDance, initialLevel, initialBpm }: MetronomeP
             barRef.current = bar + 1;
           }
         } else if (bar >= runLengthRef.current) {
-          // That was the last beat of the last bar — stop just after it sounds.
+          // That was the last beat of the last bar. Stop just after it sounds.
           finishedRef.current = true;
           const stopId = window.setTimeout(() => stop(), delayMs + 80);
           visualTimersRef.current.push(stopId);
@@ -180,7 +180,7 @@ export function Metronome({ initialDance, initialLevel, initialBpm }: MetronomeP
 
   const start = async () => {
     // iOS Safari: route web audio through the media ("playback") channel
-    // where the Audio Session API exists — otherwise the phone's silent
+    // where the Audio Session API exists. Otherwise the phone's silent
     // switch mutes the click even at full volume.
     try {
       const session = (navigator as unknown as { audioSession?: { type: string } }).audioSession;
@@ -189,7 +189,7 @@ export function Metronome({ initialDance, initialLevel, initialBpm }: MetronomeP
       // Older browsers have no audioSession; the hint under the controls
       // covers the silent-switch case there.
     }
-    // Create/resume the AudioContext here, inside the tap — never on load.
+    // Create/resume the AudioContext here, inside the tap, never on load.
     if (!ctxRef.current) {
       const Ctor =
         window.AudioContext ??
@@ -338,7 +338,7 @@ export function Metronome({ initialDance, initialLevel, initialBpm }: MetronomeP
           </p>
         ) : (
           <p className="mt-1 text-sm text-gray-600">
-            No set tempo for this dance at this level — pick another level, or set a tempo below.
+            No set tempo for this dance at this level. Pick another level, or set a tempo below.
           </p>
         )}
       </div>
@@ -372,7 +372,7 @@ export function Metronome({ initialDance, initialLevel, initialBpm }: MetronomeP
         </button>
       </div>
       <p className="text-xs text-gray-500">
-        No sound? On iPhone, Safari can silence web audio while the phone&apos;s silent switch is on — flip silent
+        No sound? On iPhone, Safari can silence web audio while the phone&apos;s silent switch is on. Flip silent
         mode off and turn the volume up, then tap Start again.
       </p>
 

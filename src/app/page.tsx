@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { env } from "@/lib/env";
+import { featuredVendors } from "@/lib/vendors";
 
 export default async function Home({ searchParams }: PageProps<"/">) {
   const { notice } = await searchParams;
@@ -23,7 +24,19 @@ export default async function Home({ searchParams }: PageProps<"/">) {
     {
       href: "/parents",
       title: "Ask a Parent",
-      body: "New to all this? Ask the parents who've done it — first feiseanna, dress fittings, practice routines and more.",
+      body: "New to all this? Ask the parents who've done it: first feiseanna, dress fittings, practice routines and more.",
+    },
+    {
+      href: "/vendors",
+      title: "Vendor directory",
+      body: `Dress makers, shoe brands, wig specialists and accessory shops, each checked against its official website.${
+        featuredVendors().length
+          ? ` Featured: ${featuredVendors()
+              .slice(0, 2)
+              .map((v) => v.name)
+              .join(" · ")}.`
+          : ""
+      }`,
     },
   ];
   return (
@@ -56,7 +69,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
           <li key={s.href}>
             <Link href={s.href} className="card block">
               <h2 className="flex items-center gap-2 text-lg font-semibold">
-                <span className="font-mono text-sm font-medium text-brand-700">{String(i + 1).padStart(2, "0")} —</span>
+                <span className="font-mono text-sm font-medium text-brand-700">{String(i + 1).padStart(2, "0")}.</span>
                 {s.title}
                 {"badge" in s && s.badge ? <span className="badge bg-brand-100 text-brand-900">{s.badge}</span> : null}
               </h2>

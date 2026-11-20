@@ -28,7 +28,7 @@ export default async function ListingPhotosPage({ params }: PageProps<"/marketpl
     <div className="space-y-4">
       <h1 className="page-title">Photos for “{listing.title}”</h1>
       <p className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
-        Item only, please — no dancers or other people. Hidden location data is removed from every photo
+        Item only, please: no dancers or other people. Hidden location data is removed from every photo
         automatically.
       </p>
       <ul className="grid grid-cols-3 gap-2">
@@ -48,7 +48,7 @@ export default async function ListingPhotosPage({ params }: PageProps<"/marketpl
         <PhotoUploader listingId={id} remaining={8 - photos.length} />
       </div>
       <Link href={`/marketplace/${id}`} className="btn w-full">
-        Done — view listing
+        Done, view listing
       </Link>
     </div>
   );

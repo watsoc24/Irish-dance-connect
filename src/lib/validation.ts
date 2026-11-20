@@ -113,7 +113,7 @@ export const CONDITIONS = [
 ] as const;
 export const categoryLabel = (v: string) => CATEGORIES.find(([k]) => k === v)?.[1] ?? v;
 export const conditionLabel = (v: string) => CONDITIONS.find(([k]) => k === v)?.[1] ?? v;
-export const levelLabel = (v: string | null) => DANCE_LEVELS.find(([k]) => k === v)?.[1] ?? "—";
+export const levelLabel = (v: string | null) => DANCE_LEVELS.find(([k]) => k === v)?.[1] ?? "Not set";
 
 /**
  * Practice-music dance/level pairs (spec §1 Part D), derived from the
@@ -228,7 +228,7 @@ export const reportSchema = z.object({
   reason: text("Reason", 5, 1000),
 });
 
-/** Parents' Q&A board ("Ask a Parent") — bounds mirror the DB checks. */
+/** Parents' Q&A board ("Ask a Parent"): bounds mirror the DB checks. */
 export const questionSchema = z.object({
   title: text("Title", 5, 140),
   body: text("Question", 10, 4000),

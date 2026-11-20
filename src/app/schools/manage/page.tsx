@@ -157,7 +157,7 @@ export default async function ManageSchoolPage({ searchParams }: PageProps<"/sch
               <div>
                 <h3 className="font-semibold">Choreography</h3>
                 <p className="text-xs text-gray-500">
-                  Staff-only — dancers can&apos;t see this yet. Add the steps your school teaches, with an optional
+                  Staff-only: dancers can&apos;t see this yet. Add the steps your school teaches, with an optional
                   video link.
                 </p>
               </div>

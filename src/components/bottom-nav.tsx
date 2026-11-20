@@ -8,6 +8,7 @@ const items = [
   { href: "/schools", label: "Schools" },
   { href: "/practice", label: "Practice" },
   { href: "/parents", label: "Parents" },
+  { href: "/vendors", label: "Vendors" },
   { href: "/marketplace", label: "Market" },
   { href: "/messages", label: "Messages", auth: true },
   { href: "/account", label: "Account", auth: true },

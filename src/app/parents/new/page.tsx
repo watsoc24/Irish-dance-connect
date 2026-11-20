@@ -30,7 +30,7 @@ export default async function NewQuestionPage() {
             required
             minLength={10}
             maxLength={4000}
-            hint="Details help other parents answer — your dancer's level and what you've already tried are great to include."
+            hint="Details help other parents answer. Your dancer's level and what you've already tried are great to include."
           />
         </ActionForm>
       ) : (

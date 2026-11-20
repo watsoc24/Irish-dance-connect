@@ -57,6 +57,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
               <Link href="/schools">Schools</Link>
               <Link href="/practice">Practice</Link>
               <Link href="/parents">Parents</Link>
+              <Link href="/vendors">Vendors</Link>
               <Link href="/marketplace">Marketplace</Link>
               {account ? <Link href="/messages">Messages</Link> : null}
               {account?.isPlatformAdmin ? <Link href="/admin">Admin</Link> : null}
@@ -77,7 +78,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         <div className="knot-strip" aria-hidden="true" />
         <footer className="mx-auto mb-24 w-full max-w-3xl px-4 py-6 text-sm text-muted sm:mb-0">
           <p className="mb-3">
-            Irish Dance Connect — feis calendar, school directory, and a dress &amp; gear marketplace. Run by a dance
+            Irish Dance Connect: feis calendar, school directory, and a dress &amp; gear marketplace. Run by a dance
             family in Ohio.
           </p>
           <div className="flex flex-wrap gap-4">

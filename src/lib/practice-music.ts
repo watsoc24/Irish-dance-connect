@@ -3,7 +3,7 @@
 //
 // Static facts only: dance/level lists, time signatures, feis tempos,
 // bar counts, traditional tune names and notation links. No audio or
-// video is hosted anywhere in this app — every "listen" option is an
+// video is hosted anywhere in this app. Every "listen" option is an
 // outbound link (a Spotify or YouTube search for the tune at the tempo).
 // Traditional tunes are public domain; recordings are not, so we never
 // link to a specific recording as if it were ours to give away, and we
@@ -50,7 +50,7 @@ export interface Level {
 
 export interface Tune {
   name: string;
-  /** TheSession.org tune page — only set where the URL is verified. */
+  /** TheSession.org tune page: only set where the URL is verified. */
   sessionUrl?: string;
 }
 
@@ -62,7 +62,7 @@ export interface ListenLink {
 export interface PracticeEntry {
   dance: DanceSlug;
   level: LevelSlug;
-  /** Paid tier is designed for, not built — everything is "free" for now. */
+  /** Paid tier is designed for, not built; everything is "free" for now. */
   access: Access;
   timeSignature: string;
   bpm: number;
@@ -101,7 +101,7 @@ export function getLevel(slug: string | undefined | null): Level | undefined {
 }
 
 // ---------------------------------------------------------------------------
-// Tempo table — spec §2, North America (IDTANA), embedded exactly.
+// Tempo table: spec §2, North America (IDTANA), embedded exactly.
 // BPM means counted beats per minute (reels/hornpipes are counted on 2
 // significant beats per bar), not raw note rate.
 //
@@ -114,7 +114,7 @@ export function getLevel(slug: string | undefined | null): Level | undefined {
 //   adult                    -> Novice column (adult dancers generally
 //                              dance novice speeds)
 // Two cells in the spec allow either of two speeds; tempoFor must return
-// one number, so we use the common progression — the faster speed at
+// one number, so we use the common progression, the faster speed at
 // Novice, the slower, more controlled speed at Prizewinner:
 //   Treble Jig  Novice 92 / Prizewinner 73   (spec: "73 or 92")
 //   Hornpipe    Novice 138 / Prizewinner 113 (spec: "113 or 138")
@@ -175,9 +175,9 @@ export function barsFor(danceSlug: string, levelSlug: string): number {
 }
 
 // ---------------------------------------------------------------------------
-// Tempo chart — the spec §2 table verbatim, for display on /practice.
-// "—" means the dance is not danced at that level; "73 or 92" etc. are
-// the spec's either-speed cells (tempoFor picks one — see note above).
+// Tempo chart: the spec §2 table verbatim, for display on /practice.
+// "n/a" means the dance is not danced at that level; "73 or 92" etc. are
+// the spec's either-speed cells (tempoFor picks one; see note above).
 // ---------------------------------------------------------------------------
 
 export interface TempoChartRow {
@@ -192,18 +192,18 @@ export interface TempoChartRow {
 
 export const TEMPO_CHART: TempoChartRow[] = [
   { dance: "reel", timeSignature: "4/4", beginner: "122", advancedBeginner: "122", novice: "113", prizewinner: "113", championship: "113" },
-  { dance: "light-jig", timeSignature: "6/8", beginner: "115", advancedBeginner: "115", novice: "115", prizewinner: "115", championship: "—" },
+  { dance: "light-jig", timeSignature: "6/8", beginner: "115", advancedBeginner: "115", novice: "115", prizewinner: "115", championship: "n/a" },
   { dance: "slip-jig", timeSignature: "9/8", beginner: "122", advancedBeginner: "122", novice: "113", prizewinner: "113", championship: "113" },
-  { dance: "single-jig", timeSignature: "6/8 (12/8)", beginner: "124", advancedBeginner: "124", novice: "124", prizewinner: "124", championship: "—" },
-  { dance: "treble-jig", timeSignature: "6/8", beginner: "—", advancedBeginner: "92", novice: "73 or 92", prizewinner: "73 or 92", championship: "73" },
-  { dance: "hornpipe", timeSignature: "2/4 or 4/4", beginner: "—", advancedBeginner: "138", novice: "113 or 138", prizewinner: "113 or 138", championship: "113" },
-  { dance: "treble-reel", timeSignature: "4/4", beginner: "—", advancedBeginner: "—", novice: "113", prizewinner: "113", championship: "113" },
+  { dance: "single-jig", timeSignature: "6/8 (12/8)", beginner: "124", advancedBeginner: "124", novice: "124", prizewinner: "124", championship: "n/a" },
+  { dance: "treble-jig", timeSignature: "6/8", beginner: "n/a", advancedBeginner: "92", novice: "73 or 92", prizewinner: "73 or 92", championship: "73" },
+  { dance: "hornpipe", timeSignature: "2/4 or 4/4", beginner: "n/a", advancedBeginner: "138", novice: "113 or 138", prizewinner: "113 or 138", championship: "113" },
+  { dance: "treble-reel", timeSignature: "4/4", beginner: "n/a", advancedBeginner: "n/a", novice: "113", prizewinner: "113", championship: "113" },
 ];
 
 // ---------------------------------------------------------------------------
 // Traditional tunes per dance. Well-known session standards. A
 // TheSession.org link is included only where the tune's page URL has
-// been verified — never guess a tune URL.
+// been verified. Never guess a tune URL.
 // ---------------------------------------------------------------------------
 
 const TUNES: Record<DanceSlug, Tune[]> = {
@@ -272,10 +272,10 @@ function listenLinks(tuneName: string, danceName: string, bpm: number): ListenLi
 export const SOFTLEY_ARTIST_URL = "https://open.spotify.com/artist/1O4dmip9mMFZJ9hEUgGfGe";
 
 const SOFTLEY_TRACKS: Partial<Record<string, ListenLink>> = {
-  "reel:122": { label: "Sean Softley — Beginner Reels (122)", url: "https://open.spotify.com/track/4K9M1HIW6jsyUWEkW7GDRP" },
-  "reel:113": { label: "Sean Softley — Reels (113)", url: "https://open.spotify.com/track/2vRpevytjBvCmpFYcMyzOg" },
-  "light-jig:115": { label: "Sean Softley — Light Jigs (115)", url: "https://open.spotify.com/track/0g1pgPrc6HAM688kbxkj8l" },
-  "treble-jig:73": { label: "Sean Softley — Open Heavy Jigs (73)", url: "https://open.spotify.com/track/1cs8QnFEOk7yBvyMPdacja" },
+  "reel:122": { label: "Sean Softley: Beginner Reels (122)", url: "https://open.spotify.com/track/4K9M1HIW6jsyUWEkW7GDRP" },
+  "reel:113": { label: "Sean Softley: Reels (113)", url: "https://open.spotify.com/track/2vRpevytjBvCmpFYcMyzOg" },
+  "light-jig:115": { label: "Sean Softley: Light Jigs (115)", url: "https://open.spotify.com/track/0g1pgPrc6HAM688kbxkj8l" },
+  "treble-jig:73": { label: "Sean Softley: Open Heavy Jigs (73)", url: "https://open.spotify.com/track/1cs8QnFEOk7yBvyMPdacja" },
 };
 
 /**

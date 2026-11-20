@@ -58,7 +58,7 @@ export default async function FeisPage({ searchParams }: PageProps<"/feis">) {
       ) : null}
       <p className="text-sm text-gray-600">
         Listings are curated from Planxti, the IDTANA regional calendars, FeisWeb and QuickFeis.
-        Registration happens on each organizer&apos;s own site — tap a feis to register there. Dates and
+        Registration happens on each organizer&apos;s own site. Tap a feis to register there. Dates and
         details can change, so always confirm on the organizer&apos;s site.
       </p>
       <form className="space-y-2" role="search">

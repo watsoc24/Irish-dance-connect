@@ -60,7 +60,7 @@ body {
   .hint {
     @apply mt-1 text-sm text-muted;
   }
-  /* Double rule (3px emerald + 1px gold) under the title — a nod to dress trim. */
+  /* Double rule (3px emerald + 1px gold) under the title, a nod to dress trim. */
   .page-title {
     @apply mb-5 font-display text-[32px] leading-[1.1] font-bold text-ink;
     padding-bottom: 10px;

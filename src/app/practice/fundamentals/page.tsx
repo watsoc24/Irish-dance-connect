@@ -5,11 +5,11 @@ export const metadata = { title: "Fundamentals" };
 const fundamentals = [
   {
     name: "Point",
-    what: "Pointing means extending the foot through the ankle so the whole foot — not just the toes — makes one long line with the leg.",
+    what: "Pointing means extending the foot through the ankle so the whole foot (not just the toes) makes one long line with the leg.",
     drill:
       "Stand tall holding the back of a chair or a wall for balance. Slowly extend one foot forward along the floor, pointing through the ankle, hold for a slow count of three, then return the foot to the floor. Repeat five times on each foot.",
     watchFor: [
-      "Point through the ankle — don't just curl the toes.",
+      "Point through the ankle; don't just curl the toes.",
       "Keep the foot in line with the leg, not turned in or out.",
       "Keep your hips level and your standing leg steady.",
     ],
@@ -18,11 +18,11 @@ const fundamentals = [
   },
   {
     name: "Turn out",
-    what: "Turn out means the feet are turned out from the hips, with the knees tracking over the toes. Turnout always comes from the hip — never by twisting the knee or ankle.",
+    what: "Turn out means the feet are turned out from the hips, with the knees tracking over the toes. Turnout always comes from the hip, never by twisting the knee or ankle.",
     drill:
       "Stand tall with your feet in a small V, heels together and toes pointing out. Slowly bend both knees, keeping each knee over its toes, then straighten again. Repeat five times, keeping your heels on the floor.",
     watchFor: [
-      "Knees track over the toes as you bend — they should not roll inward.",
+      "Knees track over the toes as you bend; they should not roll inward.",
       "Turn out from the hips; never force it by twisting a knee or ankle.",
       "Keep your heels on the floor and your weight even across both feet.",
     ],
@@ -36,7 +36,7 @@ const fundamentals = [
       "Stand tall, then step one foot across in front of the other, placing it in a crossed position with the knees together. Hold for a slow count of three, step back to standing, then cross with the other foot in front. Repeat five times on each side.",
     watchFor: [
       "Keep the knees together when the feet are crossed.",
-      "Cross cleanly — the feet should not catch or trip each other.",
+      "Cross cleanly: the feet should not catch or trip each other.",
       "Keep your upper body upright and still while the feet move.",
     ],
     dances: "Reel and treble jig",
@@ -49,7 +49,7 @@ const fundamentals = [
       "Stand tall with your arms straight at your sides and your hands in relaxed fists. March slowly in place, lifting each knee in turn, while keeping your arms still and your shoulders down. Try ten slow steps.",
     watchFor: [
       "Shoulders stay down and relaxed, not up by your ears.",
-      "Hands are relaxed fists — not clenched tight and not flapping.",
+      "Hands are relaxed fists, not clenched tight and not flapping.",
       "Arms stay still at your sides while the legs move.",
     ],
     dances: "All dances",
@@ -66,7 +66,7 @@ export default function FundamentalsPage() {
       <h1 className="page-title">Fundamentals</h1>
       <p>
         Four basics every Irish dancer works on: point, turn out, cross, and arms. These drills are simple,
-        beginner-level, and safe to do at home. Work through them slowly — good habits built slowly last.
+        beginner-level, and safe to do at home. Work through them slowly. Good habits built slowly last.
       </p>
       <p className="rounded-xl bg-brand-50 p-3 text-sm text-brand-900">
         Safety note: stop if anything hurts, and ask your teacher if you are unsure about any of these. If a
