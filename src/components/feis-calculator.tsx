@@ -5,7 +5,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 // Feis stage time calculator. A parent enters their dancer's competition
 // number, the stage start time, and the running order (competition
 // number, dance, dancer count, and a type preset), and gets an estimated
-// on-stage time. Competition numbers usually break down with the first
+// on-stage time. The feis name field suggests published listings from
+// the site calendar (passed in as a prop by the server page) and falls
+// back to plain free text. Competition numbers usually break down with the first
 // digit as the level (1 First Feis to 7 Open Championship) and the last
 // two digits as the age group. All timing assumptions live in PRESETS
 // below so the math stays simple and explainable. The form persists to
@@ -118,6 +120,17 @@ function formatSpeed(speed: number): string {
   return Number.isInteger(speed) ? String(speed) : String(Math.round(speed * 10) / 10);
 }
 
+/** One published feis from the calendar, passed in by the server page for the name typeahead. */
+export interface FeisListing {
+  id: string;
+  name: string;
+  startsOn: string;
+  endsOn: string;
+  city: string;
+  /** The listing's state (the feis_events region column holds the state name). */
+  state: string;
+}
+
 interface Row {
   id: string;
   /** Competition number as typed, e.g. "713". */
@@ -137,6 +150,8 @@ interface Row {
 
 interface FormState {
   feisName: string;
+  /** Id of the calendar listing the name was picked from, or "" for free text. */
+  feisId: string;
   stage: string;
   startTime: string;
   dancerNumber: string;
@@ -159,6 +174,7 @@ const DEFAULT_ROWS: Row[] = [
 
 const DEFAULT_STATE: FormState = {
   feisName: "",
+  feisId: "",
   stage: "",
   startTime: "08:00",
   dancerNumber: "713",
@@ -223,6 +239,21 @@ function formatTime(totalMinutes: number): string {
   return `${hour12}:${String(minute).padStart(2, "0")} ${suffix}`;
 }
 
+/** "2026-12-05" to "Sat, Dec 5, 2026"; a multi-day feis adds its end date. */
+function formatFeisDate(startsOn: string, endsOn: string): string {
+  const opts: Intl.DateTimeFormatOptions = {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  };
+  const start = new Date(`${startsOn}T00:00:00Z`).toLocaleDateString("en-US", opts);
+  if (startsOn === endsOn) return start;
+  const end = new Date(`${endsOn}T00:00:00Z`).toLocaleDateString("en-US", opts);
+  return `${start} to ${end}`;
+}
+
 interface TimedRow {
   row: Row;
   start: number;
@@ -259,6 +290,7 @@ function sanitizeState(value: unknown): FormState | null {
   }
   return {
     feisName: typeof v.feisName === "string" ? v.feisName : "",
+    feisId: typeof v.feisId === "string" ? v.feisId : "",
     stage: typeof v.stage === "string" ? v.stage : "",
     startTime: typeof v.startTime === "string" ? v.startTime : "08:00",
     dancerNumber: typeof v.dancerNumber === "string" ? v.dancerNumber : "",
@@ -335,9 +367,10 @@ function SetFields({
   );
 }
 
-export function FeisCalculator() {
+export function FeisCalculator({ feisListings = [] }: { feisListings?: FeisListing[] }) {
   const [state, setState] = useState<FormState>(DEFAULT_STATE);
   const [loaded, setLoaded] = useState(false);
+  const [feisOpen, setFeisOpen] = useState(false);
   const nextId = useRef(1);
 
   // Load saved state once, after first render, so server and first
@@ -399,6 +432,39 @@ export function FeisCalculator() {
   );
   const headline = matches.length > 0 ? matches[0] : !hasNumber ? mineTimed : null;
   const decoded = decodeComp(state.dancerNumber);
+
+  // Feis name typeahead, matched against the calendar listings passed
+  // from the server. Picking a listing stores its id; the confirmation
+  // line shows only while the typed name still matches it exactly, so
+  // editing the name after picking quietly returns the field to free text.
+  const pickedFeis = state.feisId
+    ? (feisListings.find((l) => l.id === state.feisId) ?? null)
+    : null;
+  const confirmedFeis = pickedFeis && state.feisName === pickedFeis.name ? pickedFeis : null;
+  const feisQuery = state.feisName.trim().toLowerCase();
+  const feisMatches =
+    feisQuery.length >= 2
+      ? feisListings
+          .filter(
+            (l) =>
+              l.name.toLowerCase().includes(feisQuery) || l.city.toLowerCase().includes(feisQuery),
+          )
+          .slice(0, 8)
+      : [];
+  const showFeisList = feisOpen && !confirmedFeis && feisMatches.length > 0;
+
+  const onFeisNameChange = (value: string) => {
+    setState((s) => {
+      const picked = feisListings.find((l) => l.id === s.feisId);
+      return { ...s, feisName: value, feisId: picked && value === picked.name ? s.feisId : "" };
+    });
+    setFeisOpen(true);
+  };
+
+  const pickFeis = (listing: FeisListing) => {
+    setState((s) => ({ ...s, feisName: listing.name, feisId: listing.id }));
+    setFeisOpen(false);
+  };
 
   const updateRow = (id: string, patch: Partial<Row>) =>
     setState((s) => ({ ...s, rows: s.rows.map((r) => (r.id === id ? { ...r, ...patch } : r)) }));
@@ -477,14 +543,64 @@ export function FeisCalculator() {
           <label className="label" htmlFor="calc-feis">
             Feis name (optional)
           </label>
-          <input
-            id="calc-feis"
-            className="input w-full"
-            value={state.feisName}
-            onChange={(e) => setState((s) => ({ ...s, feisName: e.target.value }))}
-            placeholder="e.g. Gem City Feis"
-            maxLength={80}
-          />
+          <div
+            className="relative"
+            onBlur={(e) => {
+              if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFeisOpen(false);
+            }}
+          >
+            <input
+              id="calc-feis"
+              className="input w-full"
+              value={state.feisName}
+              onChange={(e) => onFeisNameChange(e.target.value)}
+              onFocus={() => setFeisOpen(true)}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") setFeisOpen(false);
+              }}
+              placeholder="e.g. Gem City Feis"
+              maxLength={80}
+              autoComplete="off"
+              role="combobox"
+              aria-expanded={showFeisList}
+              aria-controls="calc-feis-list"
+            />
+            {showFeisList ? (
+              <ul
+                id="calc-feis-list"
+                role="listbox"
+                aria-label="Feiseanna from the calendar"
+                className="absolute inset-x-0 top-full z-20 mt-1 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg"
+              >
+                {feisMatches.map((listing) => (
+                  <li key={listing.id} role="option" aria-selected={false}>
+                    <button
+                      type="button"
+                      className="block w-full px-3 py-2 text-left hover:bg-brand-50 focus:bg-brand-50"
+                      onClick={() => pickFeis(listing)}
+                    >
+                      <span className="block font-medium">{listing.name}</span>
+                      <span className="block text-sm text-gray-600">
+                        {formatFeisDate(listing.startsOn, listing.endsOn)} · {listing.city}
+                        {listing.state ? `, ${listing.state}` : ""}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
+          {confirmedFeis ? (
+            <p className="mt-1 text-sm text-gray-600">
+              From the feis calendar: {formatFeisDate(confirmedFeis.startsOn, confirmedFeis.endsOn)},{" "}
+              {confirmedFeis.city}
+              {confirmedFeis.state ? `, ${confirmedFeis.state}` : ""}.
+            </p>
+          ) : null}
+          <p className="mt-1 text-sm text-gray-600">
+            Start typing and pick your feis from the calendar, or just type its name if it is not listed
+            yet.
+          </p>
         </div>
         <div className="flex gap-2">
           <div className="min-w-0 flex-1">
