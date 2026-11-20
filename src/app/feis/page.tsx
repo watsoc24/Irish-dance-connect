@@ -63,7 +63,7 @@ export default async function FeisPage({ searchParams }: PageProps<"/feis">) {
       <Link href="/feis/calculator" className="card block space-y-1">
         <span className="font-semibold">Stage time calculator</span>
         <span className="block text-sm text-gray-600">
-          Find out when your dancer is likely to be on, from the stage start time and the running order.
+          Find out when your dancer is likely to be on. Enter their competition number and the stage running order.
         </span>
       </Link>
       <form className="space-y-2" role="search">

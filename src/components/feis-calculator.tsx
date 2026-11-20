@@ -2,12 +2,14 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
-// Feis stage time calculator. A parent enters the stage start time and
-// the running order (competition name, dancer count, and a type preset),
-// marks their dancer's competition, and gets an estimated on-stage time.
-// All timing assumptions live in PRESETS below so the math stays simple
-// and explainable. The form persists to localStorage so a refresh on
-// feis day does not lose it.
+// Feis stage time calculator. A parent enters their dancer's competition
+// number, the stage start time, and the running order (competition
+// number, dance, dancer count, and a type preset), and gets an estimated
+// on-stage time. Competition numbers usually break down with the first
+// digit as the level (1 First Feis to 7 Open Championship) and the last
+// two digits as the age group. All timing assumptions live in PRESETS
+// below so the math stays simple and explainable. The form persists to
+// localStorage so a refresh on feis day does not lose it.
 
 type RowType =
   | "grades-2"
@@ -40,9 +42,91 @@ const PRESETS: Record<RowType, Preset> = {
 
 const ROW_TYPES = Object.keys(PRESETS) as RowType[];
 
+const DANCES = [
+  "Any dance",
+  "Reel",
+  "Slip Jig",
+  "Light Jig",
+  "Single Jig",
+  "Treble Jig",
+  "Hornpipe",
+  "Set Dance",
+  "Traditional Set",
+  "Céilí or Team",
+  "Other",
+] as const;
+
+type Dance = (typeof DANCES)[number];
+
+const LEVELS: Record<string, string> = {
+  "1": "First Feis",
+  "2": "Beginner 1",
+  "3": "Beginner 2",
+  "4": "Novice",
+  "5": "Prizewinner",
+  "6": "Preliminary Championship",
+  "7": "Open Championship",
+};
+
+interface DecodedComp {
+  digit: number;
+  level: string;
+  age: number;
+}
+
+/** Decode a three digit competition number, or null if it does not fit the usual scheme. */
+function decodeComp(raw: string): DecodedComp | null {
+  const t = raw.trim();
+  if (!/^[1-7][0-9][0-9]$/.test(t)) return null;
+  return { digit: Number(t[0]), level: LEVELS[t[0]], age: Number.parseInt(t.slice(1), 10) };
+}
+
+/** Compare competition numbers loosely: trimmed, case-insensitive, leading zeros stripped. */
+function normalizeNumber(raw: string): string {
+  const t = raw.trim().toLowerCase();
+  if (/^[0-9]+$/.test(t)) return String(Number.parseInt(t, 10));
+  return t;
+}
+
+// Fixed speeds (bpm) for the seven traditional sets, from the site's
+// verified tempo chart. Modern sets are typed in by the parent.
+const TRADITIONAL_SET_SPEEDS: Record<string, number> = {
+  "St. Patrick's Day": 94,
+  Blackbird: 144,
+  "Garden of Daisies": 138,
+  "Job of Journeywork": 138,
+  "Jockey to the Fair": 90,
+  "King of the Fairies": 130,
+  "Three Sea Captains": 96,
+};
+
+const SET_NAMES = [...Object.keys(TRADITIONAL_SET_SPEEDS), "The Storyteller", "Other modern set"];
+
+function isSetDance(dance: Dance): boolean {
+  return dance === "Set Dance" || dance === "Traditional Set";
+}
+
+/** The speed a set is danced at: fixed for traditional sets, else the typed value. */
+function setSpeed(setName: string, speedText: string): number | null {
+  const fixed = TRADITIONAL_SET_SPEEDS[setName];
+  if (fixed) return fixed;
+  const n = Number.parseFloat(speedText);
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+
+function formatSpeed(speed: number): string {
+  return Number.isInteger(speed) ? String(speed) : String(Math.round(speed * 10) / 10);
+}
+
 interface Row {
   id: string;
-  name: string;
+  /** Competition number as typed, e.g. "713". */
+  comp: string;
+  dance: Dance;
+  /** Set name, only used when the dance is a set dance. */
+  setName: string;
+  /** Raw speed text (bpm), only used for modern sets. */
+  speed: string;
   /** Raw input text; parsed when computing so typing stays smooth. */
   count: string;
   type: RowType;
@@ -55,32 +139,71 @@ interface FormState {
   feisName: string;
   stage: string;
   startTime: string;
+  dancerNumber: string;
+  dancerDance: Dance;
+  dancerSetName: string;
+  dancerSpeed: string;
   rows: Row[];
 }
 
-const STORAGE_KEY = "idc-feis-calculator";
+const STORAGE_KEY = "idc-feis-calculator-v2";
 
 const DEFAULT_ROWS: Row[] = [
-  { id: "sample-1", name: "Reel U10", count: "24", type: "grades-2", breakMinutes: "30", mine: false },
-  { id: "sample-2", name: "Light Jig U10", count: "24", type: "grades-1", breakMinutes: "30", mine: false },
-  { id: "sample-3", name: "Championship U12", count: "12", type: "championship", breakMinutes: "30", mine: true },
-  { id: "sample-4", name: "Lunch break", count: "0", type: "break", breakMinutes: "30", mine: false },
+  { id: "sample-1", comp: "206", dance: "Reel", setName: "King of the Fairies", speed: "130", count: "18", type: "grades-2", breakMinutes: "30", mine: false },
+  { id: "sample-2", comp: "206", dance: "Light Jig", setName: "King of the Fairies", speed: "130", count: "18", type: "grades-1", breakMinutes: "30", mine: false },
+  { id: "sample-3", comp: "512", dance: "Reel", setName: "King of the Fairies", speed: "130", count: "22", type: "grades-2", breakMinutes: "30", mine: false },
+  { id: "sample-4", comp: "713", dance: "Other", setName: "King of the Fairies", speed: "130", count: "15", type: "championship", breakMinutes: "30", mine: false },
+  { id: "sample-5", comp: "615", dance: "Set Dance", setName: "The Storyteller", speed: "69", count: "10", type: "set", breakMinutes: "30", mine: false },
+  { id: "sample-6", comp: "", dance: "Reel", setName: "King of the Fairies", speed: "130", count: "0", type: "break", breakMinutes: "30", mine: false },
 ];
 
-const DEFAULT_STATE: FormState = { feisName: "", stage: "", startTime: "08:00", rows: DEFAULT_ROWS };
+const DEFAULT_STATE: FormState = {
+  feisName: "",
+  stage: "",
+  startTime: "08:00",
+  dancerNumber: "713",
+  dancerDance: "Any dance",
+  dancerSetName: "King of the Fairies",
+  dancerSpeed: "130",
+  rows: DEFAULT_ROWS,
+};
 
 function parseCount(text: string): number {
   const n = Number.parseInt(text, 10);
   return Number.isFinite(n) && n > 0 ? n : 0;
 }
 
-/** Minutes a row takes on stage: ceil(count / atATime) * minutesPerGroup. */
+/** Minutes a row takes on stage: ceil(count / atATime) * minutesPerGroup, with speed-based timing for set dances. */
 function rowMinutes(row: Row): number {
   if (row.type === "break") return parseCount(row.breakMinutes);
-  const preset = PRESETS[row.type];
   const count = parseCount(row.count);
   if (count === 0) return 0;
+  if (row.type === "set") {
+    // No set chosen on the row: keep the flat preset time. With a set,
+    // the music speed decides: about 150 / speed per dancer, because a
+    // slower set keeps each dancer on stage longer.
+    if (!isSetDance(row.dance)) return count * PRESETS.set.minutesPerGroup;
+    const speed = setSpeed(row.setName, row.speed) ?? 73;
+    const perDancer = Math.min(2.5, Math.max(1.25, 150 / speed));
+    return count * perDancer;
+  }
+  const preset = PRESETS[row.type];
   return Math.ceil(count / preset.atATime) * preset.minutesPerGroup;
+}
+
+/** Short label for a row, e.g. "713 · Set Dance: King of the Fairies (130)". */
+function rowLabel(row: Row): string {
+  const comp = row.comp.trim() || "Competition";
+  let dancePart: string;
+  if (isSetDance(row.dance) && row.setName) {
+    const speed = setSpeed(row.setName, row.speed);
+    dancePart = `${row.dance}: ${row.setName}${speed ? ` (${formatSpeed(speed)})` : ""}`;
+  } else if (row.dance === "Any dance" || row.dance === "Other") {
+    dancePart = PRESETS[row.type].label;
+  } else {
+    dancePart = row.dance;
+  }
+  return `${comp} · ${dancePart}`;
 }
 
 /** "08:00" to minutes since midnight; falls back to 8:00 AM. */
@@ -90,7 +213,7 @@ function startMinutes(startTime: string): number {
   return Number(match[1]) * 60 + Number(match[2]);
 }
 
-/** Minutes since midnight to a 12 hour US time. Wraps past midnight. */
+/** Minutes since midnight to a 12 hour US time, rounded to the nearest minute. Wraps past midnight. */
 function formatTime(totalMinutes: number): string {
   const wrapped = ((Math.round(totalMinutes) % 1440) + 1440) % 1440;
   const hour24 = Math.floor(wrapped / 60);
@@ -115,9 +238,13 @@ function sanitizeState(value: unknown): FormState | null {
   const rows: Row[] = v.rows.map((r, i) => {
     const row = (typeof r === "object" && r !== null ? r : {}) as Partial<Row>;
     const type = ROW_TYPES.includes(row.type as RowType) ? (row.type as RowType) : "grades-2";
+    const dance = DANCES.includes(row.dance as Dance) ? (row.dance as Dance) : "Reel";
     return {
       id: typeof row.id === "string" ? row.id : `row-${i}`,
-      name: typeof row.name === "string" ? row.name : "",
+      comp: typeof row.comp === "string" ? row.comp : "",
+      dance,
+      setName: SET_NAMES.includes(row.setName as string) ? (row.setName as string) : "King of the Fairies",
+      speed: typeof row.speed === "string" ? row.speed : "69",
       count: typeof row.count === "string" ? row.count : "0",
       type,
       breakMinutes: typeof row.breakMinutes === "string" ? row.breakMinutes : "30",
@@ -134,8 +261,78 @@ function sanitizeState(value: unknown): FormState | null {
     feisName: typeof v.feisName === "string" ? v.feisName : "",
     stage: typeof v.stage === "string" ? v.stage : "",
     startTime: typeof v.startTime === "string" ? v.startTime : "08:00",
+    dancerNumber: typeof v.dancerNumber === "string" ? v.dancerNumber : "",
+    dancerDance: DANCES.includes(v.dancerDance as Dance) ? (v.dancerDance as Dance) : "Any dance",
+    dancerSetName: SET_NAMES.includes(v.dancerSetName as string) ? (v.dancerSetName as string) : "King of the Fairies",
+    dancerSpeed: typeof v.dancerSpeed === "string" ? v.dancerSpeed : "69",
     rows,
   };
+}
+
+/** The set name and speed fields, shared by the Your dancer card and schedule rows. */
+function SetFields({
+  idPrefix,
+  setName,
+  speed,
+  onSetName,
+  onSpeed,
+}: {
+  idPrefix: string;
+  setName: string;
+  speed: string;
+  onSetName: (name: string) => void;
+  onSpeed: (value: string) => void;
+}) {
+  const fixed = TRADITIONAL_SET_SPEEDS[setName];
+  return (
+    <div className="flex gap-2">
+      <div className="min-w-0 flex-1">
+        <label className="label" htmlFor={`${idPrefix}-set`}>
+          Set
+        </label>
+        <select
+          id={`${idPrefix}-set`}
+          className="input w-full"
+          value={setName}
+          onChange={(e) => onSetName(e.target.value)}
+        >
+          {SET_NAMES.map((name) => (
+            <option key={name} value={name}>
+              {name}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="min-w-0 flex-1">
+        <label className="label" htmlFor={`${idPrefix}-speed`}>
+          Speed (bpm)
+        </label>
+        {fixed ? (
+          <input
+            id={`${idPrefix}-speed`}
+            className="input w-full"
+            value={fixed}
+            disabled
+            aria-label="Speed in beats per minute, fixed for this set"
+          />
+        ) : (
+          <input
+            id={`${idPrefix}-speed`}
+            type="number"
+            inputMode="numeric"
+            min={1}
+            className="input w-full"
+            value={speed}
+            onChange={(e) => onSpeed(e.target.value)}
+            aria-label="Speed in beats per minute"
+          />
+        )}
+        <p className="mt-1 text-sm text-gray-600">
+          {fixed ? "Traditional sets are danced at a fixed speed." : "Modern sets are usually danced between 66 and 72."}
+        </p>
+      </div>
+    </div>
+  );
 }
 
 export function FeisCalculator() {
@@ -181,8 +378,64 @@ export function FeisCalculator() {
 
   const mineTimed = timed.find((t) => t.row.mine) ?? null;
 
+  // Match the Your dancer number against the schedule. The dance picker
+  // only narrows the match when the same number appears more than once.
+  const dancerNorm = normalizeNumber(state.dancerNumber);
+  const hasNumber = dancerNorm !== "";
+  let matches: TimedRow[] = [];
+  if (hasNumber) {
+    const byNumber = timed.filter(
+      (t) => t.row.type !== "break" && t.row.comp.trim() !== "" && normalizeNumber(t.row.comp) === dancerNorm,
+    );
+    if (state.dancerDance !== "Any dance") {
+      const byDance = byNumber.filter((t) => t.row.dance === state.dancerDance);
+      matches = byDance.length > 0 ? byDance : byNumber;
+    } else {
+      matches = byNumber;
+    }
+  }
+  const yoursIds = new Set<string>(
+    hasNumber ? matches.map((t) => t.row.id) : mineTimed ? [mineTimed.row.id] : [],
+  );
+  const headline = matches.length > 0 ? matches[0] : !hasNumber ? mineTimed : null;
+  const decoded = decodeComp(state.dancerNumber);
+
   const updateRow = (id: string, patch: Partial<Row>) =>
     setState((s) => ({ ...s, rows: s.rows.map((r) => (r.id === id ? { ...r, ...patch } : r)) }));
+
+  // When a row's number becomes decodable and differs from what the row
+  // held before, set its type from the level. After that the parent can
+  // change the type freely; we never fight a manual change.
+  const updateComp = (row: Row, value: string) => {
+    const patch: Partial<Row> = { comp: value };
+    const decodedRow = decodeComp(value);
+    if (decodedRow && normalizeNumber(value) !== normalizeNumber(row.comp)) {
+      patch.type = decodedRow.digit <= 5 ? "grades-2" : "championship";
+    }
+    updateRow(row.id, patch);
+  };
+
+  const updateRowSetName = (row: Row, name: string) => {
+    const fixed = TRADITIONAL_SET_SPEEDS[name];
+    if (fixed) {
+      updateRow(row.id, { setName: name, speed: String(fixed) });
+    } else if (TRADITIONAL_SET_SPEEDS[row.setName]) {
+      updateRow(row.id, { setName: name, speed: "69" });
+    } else {
+      updateRow(row.id, { setName: name });
+    }
+  };
+
+  const updateDancerSetName = (name: string) => {
+    const fixed = TRADITIONAL_SET_SPEEDS[name];
+    if (fixed) {
+      setState((s) => ({ ...s, dancerSetName: name, dancerSpeed: String(fixed) }));
+    } else if (TRADITIONAL_SET_SPEEDS[state.dancerSetName]) {
+      setState((s) => ({ ...s, dancerSetName: name, dancerSpeed: "69" }));
+    } else {
+      setState((s) => ({ ...s, dancerSetName: name }));
+    }
+  };
 
   const markMine = (id: string) =>
     setState((s) => ({ ...s, rows: s.rows.map((r) => ({ ...r, mine: r.id === id })) }));
@@ -194,7 +447,17 @@ export function FeisCalculator() {
       ...s,
       rows: [
         ...s.rows,
-        { id: `row-${Date.now()}-${nextId.current++}`, name: "", count: "20", type: "grades-2", breakMinutes: "30", mine: false },
+        {
+          id: `row-${Date.now()}-${nextId.current++}`,
+          comp: "",
+          dance: "Reel",
+          setName: "King of the Fairies",
+          speed: "130",
+          count: "20",
+          type: "grades-2",
+          breakMinutes: "30",
+          mine: false,
+        },
       ],
     }));
 
@@ -253,27 +516,100 @@ export function FeisCalculator() {
         </div>
       </section>
 
-      {mineTimed ? (
+      <section className="card space-y-3" aria-label="Your dancer">
+        <h2 className="text-lg font-semibold">Your dancer</h2>
+        <div className="flex gap-2">
+          <div className="min-w-0 flex-1">
+            <label className="label" htmlFor="calc-dancer-number">
+              Competition number
+            </label>
+            <input
+              id="calc-dancer-number"
+              className="input w-full"
+              inputMode="numeric"
+              value={state.dancerNumber}
+              onChange={(e) => setState((s) => ({ ...s, dancerNumber: e.target.value }))}
+              placeholder="713"
+              maxLength={10}
+            />
+          </div>
+          <div className="min-w-0 flex-1">
+            <label className="label" htmlFor="calc-dancer-dance">
+              Dance
+            </label>
+            <select
+              id="calc-dancer-dance"
+              className="input w-full"
+              value={state.dancerDance}
+              onChange={(e) => setState((s) => ({ ...s, dancerDance: e.target.value as Dance }))}
+            >
+              {DANCES.map((d) => (
+                <option key={d} value={d}>
+                  {d}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        {decoded ? (
+          <p className="text-sm text-gray-600">
+            {state.dancerNumber.trim()}: {decoded.level}, age {decoded.age}. Competition numbers usually
+            break down this way, with the first digit as the level and the last two digits as the age
+            group. Some feiseanna number differently, so trust the printed schedule if yours looks
+            different.
+          </p>
+        ) : null}
+        <p className="text-sm text-gray-600">
+          The dance picker only matters if the same number appears more than once in the schedule below.
+        </p>
+        {isSetDance(state.dancerDance) ? (
+          <SetFields
+            idPrefix="calc-dancer"
+            setName={state.dancerSetName}
+            speed={state.dancerSpeed}
+            onSetName={updateDancerSetName}
+            onSpeed={(value) => setState((s) => ({ ...s, dancerSpeed: value }))}
+          />
+        ) : null}
+      </section>
+
+      {headline ? (
         <section className="card space-y-1 border-brand-600 bg-brand-50" aria-label="Your dancer's estimated time">
           <p className="text-sm font-semibold text-brand-700">
             Your dance{state.feisName ? ` at ${state.feisName}` : ""}
             {state.stage ? `, ${state.stage}` : ""}
           </p>
-          <p className="text-lg font-semibold">{mineTimed.row.name.trim() || "Your competition"}</p>
+          <p className="text-lg font-semibold">{rowLabel(headline.row)}</p>
           <p>
-            Estimated on stage at <strong>{formatTime(mineTimed.start)}</strong>. Be ready by{" "}
-            <strong>{formatTime(mineTimed.start - 45)}</strong>, hair done and shoes on.
+            Estimated on stage at <strong>{formatTime(headline.start)}</strong>. Be ready by{" "}
+            <strong>{formatTime(headline.start - 45)}</strong>, hair done and shoes on.
           </p>
+          {matches.length > 1 ? (
+            <p className="text-sm text-gray-600">
+              Competition {state.dancerNumber.trim()} comes up {matches.length} times in this schedule.
+              The time above is the first of them, and each one is marked Yours in the running order.
+            </p>
+          ) : null}
           <p className="text-sm text-gray-600">
             Stages often drift 15 to 30 minutes by midday, so treat this as a planning estimate, not a
             promise. If the stage is running behind, everything moves together.
           </p>
         </section>
+      ) : hasNumber ? (
+        <section className="card bg-brand-50" aria-label="Your dancer's estimated time">
+          <p className="text-sm text-brand-900">
+            We could not find competition <strong>{state.dancerNumber.trim()}</strong> in the schedule
+            below. Check the number against the printed schedule, and make sure one of the rows below
+            carries the same number in its Comp # box. If your feis numbers competitions differently,
+            clear the number above and tap <strong>Mine</strong> on your dancer&apos;s row instead.
+          </p>
+        </section>
       ) : (
         <section className="card bg-brand-50" aria-label="Your dancer's estimated time">
           <p className="text-sm text-brand-900">
-            Tap <strong>Mine</strong> on your dancer&apos;s competition below and we will work out when
-            they are likely to be on, and when to be ready.
+            Enter your dancer&apos;s competition number above, or tap <strong>Mine</strong> on their
+            competition in the schedule below, and we will work out when they are likely to be on, and
+            when to be ready.
           </p>
         </section>
       )}
@@ -283,27 +619,48 @@ export function FeisCalculator() {
         {state.rows.map((row, index) => {
           const preset = PRESETS[row.type];
           const isBreak = row.type === "break";
+          const yours = yoursIds.has(row.id);
           return (
-            <div key={row.id} className={`card space-y-2 ${row.mine ? "border-brand-600 bg-brand-50" : ""}`}>
-              <div className="flex items-center gap-2">
-                <span className="badge shrink-0">{index + 1}</span>
-                <input
-                  className="input min-w-0 flex-1"
-                  value={row.name}
-                  onChange={(e) => updateRow(row.id, { name: e.target.value })}
-                  placeholder={isBreak ? "e.g. Lunch" : "e.g. Reel U10"}
-                  maxLength={60}
-                  aria-label={`Competition ${index + 1} name`}
-                />
-                <button
-                  type="button"
-                  className={row.mine ? "btn shrink-0 px-3" : "btn-secondary shrink-0 px-3"}
-                  onClick={() => markMine(row.id)}
-                  aria-pressed={row.mine}
-                >
-                  Mine
-                </button>
-              </div>
+            <div key={row.id} className={`card space-y-2 ${yours ? "border-brand-600 bg-brand-50" : ""}`}>
+              {isBreak ? (
+                <div className="flex items-center gap-2">
+                  <span className="badge shrink-0">{index + 1}</span>
+                  <span className="min-w-0 flex-1 font-medium">Break</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <span className="badge shrink-0">{index + 1}</span>
+                  <input
+                    className="input w-20 shrink-0"
+                    value={row.comp}
+                    onChange={(e) => updateComp(row, e.target.value)}
+                    placeholder="713"
+                    inputMode="numeric"
+                    maxLength={10}
+                    aria-label={`Competition ${index + 1} number`}
+                  />
+                  <select
+                    className="input min-w-0 flex-1"
+                    value={row.dance}
+                    onChange={(e) => updateRow(row.id, { dance: e.target.value as Dance })}
+                    aria-label={`Competition ${index + 1} dance`}
+                  >
+                    {DANCES.map((d) => (
+                      <option key={d} value={d}>
+                        {d}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    className={row.mine ? "btn shrink-0 px-3" : "btn-secondary shrink-0 px-3"}
+                    onClick={() => markMine(row.id)}
+                    aria-pressed={row.mine}
+                  >
+                    Mine
+                  </button>
+                </div>
+              )}
               <div className="flex gap-2">
                 <select
                   className="input min-w-0 flex-1"
@@ -345,6 +702,15 @@ export function FeisCalculator() {
                   </label>
                 )}
               </div>
+              {!isBreak && isSetDance(row.dance) ? (
+                <SetFields
+                  idPrefix={`calc-row-${row.id}`}
+                  setName={row.setName}
+                  speed={row.speed}
+                  onSetName={(name) => updateRowSetName(row, name)}
+                  onSpeed={(value) => updateRow(row.id, { speed: value })}
+                />
+              ) : null}
               <div className="flex items-center justify-between text-sm text-gray-600">
                 <span>
                   {isBreak
@@ -385,18 +751,21 @@ export function FeisCalculator() {
               </tr>
             </thead>
             <tbody>
-              {timed.map((t) => (
-                <tr key={t.row.id} className={t.row.mine ? "bg-brand-50 font-semibold" : ""}>
-                  <td className="py-1 pr-2">
-                    {t.row.type === "break"
-                      ? `Break${t.row.name.trim() ? `: ${t.row.name.trim()}` : ""} (${t.minutes} min)`
-                      : t.row.name.trim() || "Untitled competition"}
-                    {t.row.mine ? <span className="badge ml-2 bg-brand-100 text-brand-900">Yours</span> : null}
-                  </td>
-                  <td className="py-1 pr-2 whitespace-nowrap">{formatTime(t.start)}</td>
-                  <td className="py-1 whitespace-nowrap">{formatTime(t.end)}</td>
-                </tr>
-              ))}
+              {timed.map((t) => {
+                const yours = yoursIds.has(t.row.id);
+                return (
+                  <tr key={t.row.id} className={yours ? "bg-brand-50 font-semibold" : ""}>
+                    <td className="py-1 pr-2">
+                      {t.row.type === "break"
+                        ? `Break (${Math.round(t.minutes)} min)`
+                        : rowLabel(t.row)}
+                      {yours ? <span className="badge ml-2 bg-brand-100 text-brand-900">Yours</span> : null}
+                    </td>
+                    <td className="py-1 pr-2 whitespace-nowrap">{formatTime(t.start)}</td>
+                    <td className="py-1 whitespace-nowrap">{formatTime(t.end)}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         ) : (
@@ -409,8 +778,16 @@ export function FeisCalculator() {
       <section className="card space-y-2" aria-label="How the estimate works">
         <h2 className="text-lg font-semibold">How the estimate works</h2>
         <p className="text-sm text-gray-600">
-          We keep it simple: each competition takes as long as its groups need, one after another from
-          the stage start time. The timings we assume are:
+          Competition numbers: at most CLRG feiseanna the three digit number puts the level first and
+          the age group last. The first digit runs from 1 for First Feis to 7 for Open Championship, and
+          the last two digits are the dancer&apos;s age on January 1 of the feis year. So 713 is Open
+          Championship, age 13, and 206 is Beginner 1, age 6. Type a number like that on a schedule row
+          and we set its type for you, grades for levels 1 to 5 and championship for levels 6 and 7. You
+          can change the type yourself at any time, and some feiseanna number differently.
+        </p>
+        <p className="text-sm text-gray-600">
+          We keep the timing simple: each competition takes as long as its groups need, one after
+          another from the stage start time. The timings we assume are:
         </p>
         <ul className="list-inside list-disc space-y-1 text-sm text-gray-600">
           <li>Grades, 2 dances: 2 dancers at a time, about 2.5 minutes per group for both dances.</li>
@@ -419,7 +796,11 @@ export function FeisCalculator() {
             Championship: 1 dancer at a time, about 5 minutes each, covering the heavy, light and set
             rounds with changeovers.
           </li>
-          <li>Set dance only: 1 dancer at a time, about 2 minutes each.</li>
+          <li>
+            Set dance only: 1 dancer at a time, timed from the music. Each dancer takes about 150
+            divided by the speed in beats per minute, so a slower speed means longer on stage.
+            Traditional sets have fixed speeds; modern sets are usually danced between 66 and 72.
+          </li>
           <li>Treble reel or special: 2 dancers at a time, about 1.5 minutes per group.</li>
           <li>Team or céilí: 1 team at a time, about 3 minutes per team.</li>
         </ul>
