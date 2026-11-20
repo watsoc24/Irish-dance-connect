@@ -264,6 +264,21 @@ function listenLinks(tuneName: string, danceName: string, bpm: number): ListenLi
 }
 
 /**
+ * Sean Softley's recordings are made at exact feis tempos, so where one
+ * of his tracks matches an entry's dance and tempo it is offered as a
+ * direct listen link ahead of the search links. Track URLs verified
+ * against his Spotify artist page on Nov 19, 2026.
+ */
+export const SOFTLEY_ARTIST_URL = "https://open.spotify.com/artist/1O4dmip9mMFZJ9hEUgGfGe";
+
+const SOFTLEY_TRACKS: Partial<Record<string, ListenLink>> = {
+  "reel:122": { label: "Sean Softley — Beginner Reels (122)", url: "https://open.spotify.com/track/4K9M1HIW6jsyUWEkW7GDRP" },
+  "reel:113": { label: "Sean Softley — Reels (113)", url: "https://open.spotify.com/track/2vRpevytjBvCmpFYcMyzOg" },
+  "light-jig:115": { label: "Sean Softley — Light Jigs (115)", url: "https://open.spotify.com/track/0g1pgPrc6HAM688kbxkj8l" },
+  "treble-jig:73": { label: "Sean Softley — Open Heavy Jigs (73)", url: "https://open.spotify.com/track/1cs8QnFEOk7yBvyMPdacja" },
+};
+
+/**
  * One entry per dance × level that has a tempo in the spec table.
  * All entries are free in this phase (see `access`).
  */
@@ -280,7 +295,10 @@ export const PRACTICE_ENTRIES: PracticeEntry[] = DANCES.flatMap((dance) =>
       bpm,
       bars: barsFor(dance.slug, level.slug),
       tunes,
-      listen: listenLinks(tunes[0].name, dance.name, bpm),
+      listen: [
+        ...(SOFTLEY_TRACKS[`${dance.slug}:${bpm}`] ? [SOFTLEY_TRACKS[`${dance.slug}:${bpm}`]!] : []),
+        ...listenLinks(tunes[0].name, dance.name, bpm),
+      ],
     };
     return [entry];
   }),

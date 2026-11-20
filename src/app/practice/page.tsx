@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Metronome } from "@/components/metronome";
-import { getDance, getLevel, LEVELS, PRACTICE_ENTRIES, TEMPO_CHART } from "@/lib/practice-music";
+import { getDance, getLevel, LEVELS, PRACTICE_ENTRIES, SOFTLEY_ARTIST_URL, TEMPO_CHART } from "@/lib/practice-music";
 
 export const metadata = { title: "Practice music" };
 
@@ -32,6 +32,18 @@ export default async function PracticePage({ searchParams }: PageProps<"/practic
       <div id="metronome">
         <Metronome initialDance={dance} initialLevel={level} initialBpm={initialBpm} />
       </div>
+
+      <section className="card space-y-2" aria-label="Featured practice artist">
+        <h2 className="text-lg font-semibold">Recorded at feis tempo</h2>
+        <p className="text-sm text-gray-600">
+          Sean Softley&apos;s tracks are recorded at the exact speeds dancers compete at — beginner reels at 122,
+          championship reels at 113, light jigs at 115, heavy jigs at 73, and the traditional set dances. Where one
+          of his tracks matches a dance below, it&apos;s the first listen link.{" "}
+          <a href={SOFTLEY_ARTIST_URL} target="_blank" rel="noreferrer" className="link">
+            Sean Softley on Spotify
+          </a>
+        </p>
+      </section>
 
       <section aria-label="Choose your level">
         <h2 className="mb-2 text-lg font-semibold">Your level</h2>
@@ -146,6 +158,24 @@ export default async function PracticePage({ searchParams }: PageProps<"/practic
           for the hornpipe. Championships add an 8-bar introduction before the 48 bars (Reel, Treble Jig, Treble
           Reel) or 40 bars (Slip Jig, Hornpipe).
         </p>
+      </section>
+
+      <section aria-label="More practice help">
+        <h2 className="mb-2 text-lg font-semibold">More practice help</h2>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Link href="/practice/fundamentals" className="card block space-y-1">
+            <h3 className="font-semibold">Fundamentals</h3>
+            <p className="text-sm text-gray-600">
+              Point, turn out, cross and arms — the four basics every dancer works on, with a simple drill for each.
+            </p>
+          </Link>
+          <Link href="/practice/conditioning" className="card block space-y-1">
+            <h3 className="font-semibold">Conditioning &amp; stretching</h3>
+            <p className="text-sm text-gray-600">
+              Light, beginner-safe exercises for ankles, hips, core and balance, plus gentle cool-down stretches.
+            </p>
+          </Link>
+        </div>
       </section>
 
       <section className="rounded-xl border border-line bg-brand-50 p-4" aria-label="Premium practice tracks coming soon">
