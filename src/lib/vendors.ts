@@ -239,6 +239,16 @@ export const VENDORS: Vendor[] = [
     offers: ["Wigs", "Shoes", "Costume jewelry and accessories"],
     website: "https://irishseams.com",
   },
+  {
+    name: "Irish Peach Imports",
+    slug: "irish-peach-imports",
+    category: "wigs-and-hair",
+    location: "Norcross, Georgia, USA",
+    blurb:
+      "A one-stop shop for Irish dance supplies near Atlanta: Camelia Rose wigs, Irish dance shoes and accessories, sold online, from its Norcross shop, and from a vendor stand at feiseanna.",
+    offers: ["Camelia Rose wigs", "Irish dance shoes", "Accessories"],
+    website: "https://irishpeachimports.com",
+  },
 
   // ---- Accessories & practice wear ----
   {
