@@ -58,25 +58,42 @@ export default async function VendorsPage({ searchParams }: PageProps<"/vendors"
         </button>
       </form>
       {category ? (
-        <section className="space-y-2" aria-label={category.name}>
-          <h2 className="text-lg font-semibold">{category.name}</h2>
-          <p className="text-muted">{category.intro}</p>
-        </section>
+        <>
+          <section className="space-y-2" aria-label={category.name}>
+            <h2 className="text-lg font-semibold">{category.name}</h2>
+            <p className="text-muted">{category.intro}</p>
+          </section>
+          {filtered.length ? (
+            <ul className="space-y-3">
+              {filtered.map((v) => (
+                <VendorCard key={v.slug} vendor={v} />
+              ))}
+            </ul>
+          ) : (
+            <p className="text-muted">No vendors in this category yet.</p>
+          )}
+        </>
       ) : (
-        VENDOR_CATEGORIES.map((c) => (
-          <p key={c.slug} className="text-sm text-gray-600">
-            <span className="font-semibold text-ink">{c.name}:</span> {c.intro}
-          </p>
-        ))
-      )}
-      {filtered.length ? (
-        <ul className="space-y-3">
-          {filtered.map((v) => (
-            <VendorCard key={v.slug} vendor={v} />
-          ))}
-        </ul>
-      ) : (
-        <p className="text-muted">No vendors in this category yet.</p>
+        VENDOR_CATEGORIES.map((c) => {
+          const inCategory = VENDORS.filter((v) => v.category === c.slug);
+          if (!inCategory.length) return null;
+          return (
+            <section key={c.slug} className="space-y-3" aria-label={c.name}>
+              <div className="space-y-1">
+                <h2 className="text-lg font-semibold">
+                  {c.name}{" "}
+                  <span className="text-sm font-normal text-muted">({inCategory.length})</span>
+                </h2>
+                <p className="text-muted">{c.intro}</p>
+              </div>
+              <ul className="space-y-3">
+                {inCategory.map((v) => (
+                  <VendorCard key={v.slug} vendor={v} />
+                ))}
+              </ul>
+            </section>
+          );
+        })
       )}
     </div>
   );
