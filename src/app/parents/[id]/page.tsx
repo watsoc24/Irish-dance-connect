@@ -6,7 +6,7 @@ import { uuidSchema } from "@/lib/validation";
 import { questionCategoryLabel } from "@/lib/parent-questions";
 import { ActionForm } from "@/components/action-form";
 import { TextArea } from "@/components/fields";
-import { createReply, deleteQuestion, deleteReply } from "../actions";
+import { createReply, deleteQuestion, deleteReply, setQuestionPinned } from "../actions";
 
 export const metadata = { title: "Question" };
 
@@ -17,6 +17,7 @@ type QuestionRow = {
   category: string;
   author_id: string;
   is_hidden: boolean;
+  is_pinned: boolean;
   created_at: string;
 };
 
@@ -35,12 +36,24 @@ export default async function ParentQuestionPage({ params }: PageProps<"/parents
 
   // RLS decides visibility: a hidden question comes back empty for
   // everyone except its author and platform admins, so it 404s here.
-  const { data: questionData } = await supabase
+  // Until the pinning migration is applied the is_pinned column does
+  // not exist and the first query errors, so fall back without it.
+  let questionResult = await supabase
     .from("parent_questions")
-    .select("id, title, body, category, author_id, is_hidden, created_at")
+    .select("id, title, body, category, author_id, is_hidden, is_pinned, created_at")
     .eq("id", id)
     .maybeSingle();
-  const question = questionData as QuestionRow | null;
+  if (questionResult.error) {
+    questionResult = await supabase
+      .from("parent_questions")
+      .select("id, title, body, category, author_id, is_hidden, created_at")
+      .eq("id", id)
+      .maybeSingle();
+  }
+  const questionRow = questionResult.data as Omit<QuestionRow, "is_pinned"> | null;
+  const question: QuestionRow | null = questionRow
+    ? { ...questionRow, is_pinned: Boolean((questionRow as { is_pinned?: boolean }).is_pinned) }
+    : null;
   if (!question) notFound();
 
   const { data: replyData } = await supabase
@@ -68,6 +81,7 @@ export default async function ParentQuestionPage({ params }: PageProps<"/parents
       <div className="space-y-2">
         <div className="flex flex-wrap items-center gap-2">
           <span className="badge bg-brand-100 text-brand-900">{questionCategoryLabel(question.category)}</span>
+          {question.is_pinned ? <span className="badge">Pinned</span> : null}
           {question.is_hidden ? <span className="badge">Hidden</span> : null}
         </div>
         <h1 className="text-2xl font-bold">{question.title}</h1>
@@ -76,6 +90,24 @@ export default async function ParentQuestionPage({ params }: PageProps<"/parents
         </p>
         <p className="whitespace-pre-line text-gray-800">{question.body}</p>
       </div>
+
+      {account?.isPlatformAdmin ? (
+        <div className="card space-y-2">
+          <h2 className="font-semibold">Admin</h2>
+          <ActionForm
+            action={setQuestionPinned.bind(null, id, !question.is_pinned)}
+            submitLabel={question.is_pinned ? "Unpin question" : "Pin question"}
+            pendingLabel="Saving…"
+            buttonClassName="btn-secondary w-full"
+          >
+            <p className="text-sm text-gray-600">
+              {question.is_pinned
+                ? "This question is pinned to the top of the board. Unpinning returns it to the normal newest-first order."
+                : "Pinning keeps this question at the top of the board for every visitor, above newer questions."}
+            </p>
+          </ActionForm>
+        </div>
+      ) : null}
 
       {isAuthor ? (
         <div className="card space-y-2">

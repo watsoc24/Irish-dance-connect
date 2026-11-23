@@ -18,6 +18,7 @@ type QuestionRow = {
   body: string;
   category: string;
   author_id: string;
+  is_pinned: boolean;
   created_at: string;
 };
 
@@ -33,16 +34,34 @@ export default async function ParentsPage({ searchParams }: PageProps<"/parents"
   const account = await getAccount();
   const supabase = await createClient();
 
-  let query = supabase
-    .from("parent_questions")
-    .select("id, title, body, category, author_id, created_at")
-    .eq("is_hidden", false)
-    .order("created_at", { ascending: false })
-    .limit(100);
-  if (q) query = query.or(`title.ilike."%${q}%",body.ilike."%${q}%"`);
-  if (category) query = query.eq("category", category);
-  const { data } = await query;
-  const questions = (data ?? []) as QuestionRow[];
+  // Pinned questions sort first, then newest first. Until the pinning
+  // migration is applied the is_pinned column does not exist and the
+  // query errors, so fall back to the plain newest-first query and the
+  // board keeps working either way.
+  const buildQuery = (withPinned: boolean) => {
+    let query = withPinned
+      ? supabase
+          .from("parent_questions")
+          .select("id, title, body, category, author_id, is_pinned, created_at")
+          .eq("is_hidden", false)
+          .order("is_pinned", { ascending: false })
+          .order("created_at", { ascending: false })
+      : supabase
+          .from("parent_questions")
+          .select("id, title, body, category, author_id, created_at")
+          .eq("is_hidden", false)
+          .order("created_at", { ascending: false });
+    query = query.limit(100);
+    if (q) query = query.or(`title.ilike."%${q}%",body.ilike."%${q}%"`);
+    if (category) query = query.eq("category", category);
+    return query;
+  };
+  let result = await buildQuery(true);
+  if (result.error) result = await buildQuery(false);
+  const questions = ((result.data ?? []) as Omit<QuestionRow, "is_pinned">[]).map((x) => ({
+    ...x,
+    is_pinned: Boolean((x as { is_pinned?: boolean }).is_pinned),
+  })) as QuestionRow[];
   const hasFilter = Boolean(q || category);
 
   // Reply counts and author display names, fetched the same way the
@@ -110,7 +129,10 @@ export default async function ParentsPage({ searchParams }: PageProps<"/parents"
             return (
               <li key={x.id}>
                 <Link href={`/parents/${x.id}`} className="card block space-y-1">
-                  <span className="badge bg-brand-100 text-brand-900">{questionCategoryLabel(x.category)}</span>
+                  <span className="flex flex-wrap items-center gap-2">
+                    <span className="badge bg-brand-100 text-brand-900">{questionCategoryLabel(x.category)}</span>
+                    {x.is_pinned ? <span className="badge">Pinned</span> : null}
+                  </span>
                   <span className="block text-lg font-semibold">{x.title}</span>
                   <span className="block text-sm text-gray-600">{excerpt(x.body)}</span>
                   <span className="block text-sm text-gray-500">

@@ -29,6 +29,28 @@ export async function createQuestion(_: FormState, formData: FormData): Promise<
   redirect(`/parents/${data.id}`);
 }
 
+/**
+ * Pin or unpin a question (platform admins only). requireUser has
+ * already enforced MFA aal2 for platform admins, matching
+ * private.is_platform_admin() in the update policy.
+ */
+export async function setQuestionPinned(questionId: string, pinned: boolean): Promise<FormState> {
+  const account = await requireUser("/parents");
+  if (!account.isPlatformAdmin) return { error: "Only platform admins can pin questions." };
+  if (!uuidSchema.safeParse(questionId).success) return { error: "Not found." };
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("parent_questions")
+    .update({ is_pinned: pinned })
+    .eq("id", questionId)
+    .select("id");
+  if (error) return dbError(error);
+  if (!data?.length) return { error: "That question could not be updated." };
+  revalidatePath("/parents");
+  revalidatePath(`/parents/${questionId}`);
+  return { ok: true, message: pinned ? "Question pinned to the top of the board." : "Question unpinned." };
+}
+
 export async function deleteQuestion(questionId: string): Promise<FormState> {
   await requireUser("/parents");
   if (!uuidSchema.safeParse(questionId).success) return { error: "Not found." };

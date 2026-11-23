@@ -113,6 +113,23 @@ that), and please don't share children's full names or photos."
   `TEST_DATABASE_URL=… npm run test:rls`; they skip nothing but need a
   local Postgres, same as the choreography tests.
 
+## 4b. Pinning (added Nov 22, 2026)
+
+- Migration `20261122000000_parent_question_pinning.sql` adds
+  `is_pinned boolean not null default false` to `parent_questions`,
+  plus an index on `(is_pinned desc, created_at desc)`. No policy
+  changes: the existing update policy already covers the column.
+- The list orders pinned questions first, then newest first, within
+  search and category filters too, and shows a "Pinned" badge. The
+  detail page shows the same badge.
+- `setQuestionPinned` in `src/app/parents/actions.ts` is platform
+  admin only (`account.isPlatformAdmin`, with `requireUser` enforcing
+  MFA aal2, matching `private.is_platform_admin()`). The control
+  renders on the detail page only for platform admins.
+- Both pages query `is_pinned` with a fallback to the pre-migration
+  column list, so the board keeps working until the owner applies the
+  migration in the SQL Editor.
+
 ## 5. Acceptance criteria
 
 - `npm run typecheck`, `npm run lint`, `npm test`, `npm run build` pass.
