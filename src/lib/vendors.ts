@@ -64,7 +64,6 @@ export interface Vendor {
   website: string;
   /** Instagram handle without the @, if the business links it publicly. */
   instagram?: string;
-  featured: boolean;
 }
 
 export const VENDORS: Vendor[] = [
@@ -79,7 +78,6 @@ export const VENDORS: Vendor[] = [
     offers: ["Bespoke solo dresses", "Ready-to-wear dresses", "Boys' costumes"],
     website: "https://www.gavindoherty.co.uk",
     instagram: "eiredesigns_official",
-    featured: true,
   },
   {
     name: "Elevation Design",
@@ -90,7 +88,6 @@ export const VENDORS: Vendor[] = [
       "Founded in 2005 by sisters Jacqueline Kennedy Bohill and Una Kennedy Boyd, Elevation designs bespoke solo dresses and class costumes from its Northern Ireland design centre.",
     offers: ["Bespoke solo dresses", "Class costumes"],
     website: "https://elevationdesign.ie",
-    featured: true,
   },
   {
     name: "John Carey Design",
@@ -102,7 +99,6 @@ export const VENDORS: Vendor[] = [
     offers: ["Bespoke solo dresses", "Essential Range dresses"],
     website: "https://johncareydesign.ie",
     instagram: "johncareydesign",
-    featured: true,
   },
   {
     name: "Celtic Klass Designs",
@@ -113,7 +109,6 @@ export const VENDORS: Vendor[] = [
       "Custom-made solo dresses and team costumes from Crossgar, run by Josephine Brennan King and Carl King; solo orders include the headpiece, kick pants and number clip.",
     offers: ["Custom solo dresses", "Team and class costumes", "Headpieces"],
     website: "https://celticklass.com",
-    featured: true,
   },
   {
     name: "Doire Dress Designs",
@@ -125,7 +120,6 @@ export const VENDORS: Vendor[] = [
     offers: ["Bespoke solo dresses", "Team dresses", "Boys' waistcoats and jackets"],
     website: "https://doiredressdesigns.com",
     instagram: "doiredressdesign",
-    featured: false,
   },
   {
     name: "Rising Star Designs",
@@ -136,7 +130,6 @@ export const VENDORS: Vendor[] = [
       "Belfast studio making bespoke solo costumes plus the budget-friendly Rince Collection, and proudly not affiliated with any one dance school, so every dancer is treated the same.",
     offers: ["Bespoke solo costumes", "Rince Collection (budget range)"],
     website: "https://www.risingstardesigns.co.uk",
-    featured: false,
   },
   {
     name: "Taylor Dresses",
@@ -148,7 +141,6 @@ export const VENDORS: Vendor[] = [
     offers: ["Solo dresses", "Boys' waistcoats"],
     website: "https://www.tayloririshdancingdresses.com",
     instagram: "taylordressesbelfast",
-    featured: false,
   },
   {
     name: "Prime Dress Designs",
@@ -160,7 +152,6 @@ export const VENDORS: Vendor[] = [
     offers: ["School and team dresses", "Solo dresses", "Beginner skirts and vests", "Headpieces and dress bags"],
     website: "https://primedressdesigns.com",
     instagram: "primedressdesigns",
-    featured: false,
   },
   {
     name: "Heidi Bird Design",
@@ -172,7 +163,6 @@ export const VENDORS: Vendor[] = [
     offers: ["School and team costumes", "Solo dresses"],
     website: "https://heidibird.com",
     instagram: "heidibirddesign",
-    featured: false,
   },
   {
     name: "Dance Bling",
@@ -183,7 +173,6 @@ export const VENDORS: Vendor[] = [
       "Made-in-the-USA solo and team dresses with genuine crystals, plus vests, practice wear and custom headpieces. No customs charges for US families.",
     offers: ["Solo and team dresses", "Practice wear", "Custom headpieces", "Alterations"],
     website: "https://www.dancebling.com",
-    featured: false,
   },
 
   // ---- Shoes ----
@@ -196,7 +185,6 @@ export const VENDORS: Vendor[] = [
       "Forty years in Irish dance: own-brand pumps and jig shoes for every level from first shoes to championship, other major brands, and socks, wigs and accessories, with worldwide delivery.",
     offers: ["Pumps and jig shoes", "Poodle socks", "Wigs and accessories"],
     website: "https://www.antoniopacelli.com",
-    featured: false,
   },
   {
     name: "Hullachan",
@@ -207,7 +195,6 @@ export const VENDORS: Vendor[] = [
       "Irish dance pumps designed by Craig Coussins with a strong focus on foot health; the full Hullachan range is sold through Antonio Pacelli.",
     offers: ["Irish dance pumps", "Highland ghillies"],
     website: "https://www.hullachan.co.uk",
-    featured: false,
   },
   {
     name: "Rutherford Shoes",
@@ -218,7 +205,6 @@ export const VENDORS: Vendor[] = [
       "US maker of hand-made jig shoes and reel pumps (including the Ultra-Lite Gold jig shoe and Galway Gold pump with Soundblaster heels and tips), plus feis accessories.",
     offers: ["Jig shoes", "Reel pumps", "Feis accessories"],
     website: "https://www.rutherfordshoes.com",
-    featured: false,
   },
   {
     name: "Keily's",
@@ -229,7 +215,6 @@ export const VENDORS: Vendor[] = [
       "US retailer serving Irish dancers since 2004, stocking Antonio Pacelli, Corr's, Rutherford, Fays and Hullachan shoes (all shipped from the US), plus socks, wigs and accessories.",
     offers: ["Irish dance shoes (major brands)", "Poodle socks", "Wigs and accessories"],
     website: "https://www.keilys.com",
-    featured: false,
   },
 
   // ---- Wigs & hair ----
@@ -243,7 +228,6 @@ export const VENDORS: Vendor[] = [
     offers: ["Full wigs", "Bun wigs", "Colour matching at competitions"],
     website: "https://www.cameliarosewigs.com",
     instagram: "cameliarosewigs",
-    featured: false,
   },
   {
     name: "Irish Seams",
@@ -254,7 +238,6 @@ export const VENDORS: Vendor[] = [
       "A one-stop feis shop (wigs, shoes, costume jewelry and accessories) selling online, from a Maryland retail shop, and from a mobile store at feiseanna.",
     offers: ["Wigs", "Shoes", "Costume jewelry and accessories"],
     website: "https://irishseams.com",
-    featured: false,
   },
 
   // ---- Accessories & practice wear ----
@@ -268,7 +251,6 @@ export const VENDORS: Vendor[] = [
     offers: ["Custom accessories", "Dance clothing and gifts"],
     website: "https://roisinrinceshop.com",
     instagram: "roisinrince",
-    featured: false,
   },
   {
     name: "Dowsa Performance Wear",
@@ -279,14 +261,9 @@ export const VENDORS: Vendor[] = [
       "Made-to-order Irish dance performance wear (embellished leotards and dresses), plus feis finishing touches such as personalised number clips, hair clips and shoe buckles.",
     offers: ["Performance wear and leotards", "Number clips and hair clips", "Shoe buckles"],
     website: "https://dowsawear.com",
-    featured: false,
   },
 ];
 
 export function getVendor(slug: string): Vendor | undefined {
   return VENDORS.find((v) => v.slug === slug);
-}
-
-export function featuredVendors(): Vendor[] {
-  return VENDORS.filter((v) => v.featured);
 }

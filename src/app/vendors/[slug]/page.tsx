@@ -30,10 +30,7 @@ export default async function VendorPage({ params }: PageProps<"/vendors/[slug]"
         &larr; Back to vendor directory
       </Link>
       <div>
-        <h1 className="page-title flex flex-wrap items-center gap-2">
-          {vendor.name}
-          {vendor.featured ? <span className="badge bg-brand-100 text-brand-900">Featured</span> : null}
-        </h1>
+        <h1 className="page-title">{vendor.name}</h1>
         <p className="text-gray-600">
           {vendorCategoryName(vendor.category)} · {vendor.location}
         </p>
@@ -73,14 +70,6 @@ export default async function VendorPage({ params }: PageProps<"/vendors/[slug]"
         sales. To order, ask about prices or book a fitting, contact {vendor.name} directly through their own
         website. Every order goes through the maker.
       </p>
-      {vendor.featured ? (
-        <p className="text-sm text-gray-600">
-          {vendor.name} is one of our founding Featured Vendors.{" "}
-          <Link href="/vendors/featured" className="link">
-            What featured means
-          </Link>
-        </p>
-      ) : null}
     </div>
   );
 }

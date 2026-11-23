@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { env } from "@/lib/env";
 import { SITE_URL } from "@/lib/site";
-import { featuredVendors } from "@/lib/vendors";
 import { JsonLd } from "@/components/json-ld";
 
 export const metadata: Metadata = {
@@ -64,14 +63,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
     {
       href: "/vendors",
       title: "Vendor directory",
-      body: `Dress makers, shoe brands, wig specialists and accessory shops, each checked against its official website.${
-        featuredVendors().length
-          ? ` Featured: ${featuredVendors()
-              .slice(0, 2)
-              .map((v) => v.name)
-              .join(" · ")}.`
-          : ""
-      }`,
+      body: "Dress makers, shoe brands, wig specialists and accessory shops, each checked against its official website.",
     },
   ];
   return (

@@ -13,10 +13,7 @@ function VendorCard({ vendor }: { vendor: Vendor }) {
   return (
     <li>
       <Link href={`/vendors/${vendor.slug}`} className="card block">
-        <h2 className="flex flex-wrap items-center gap-2 text-lg font-semibold">
-          {vendor.name}
-          {vendor.featured ? <span className="badge bg-brand-100 text-brand-900">Featured</span> : null}
-        </h2>
+        <h2 className="flex flex-wrap items-center gap-2 text-lg font-semibold">{vendor.name}</h2>
         <p className="text-sm text-muted">
           {vendorCategoryName(vendor.category)} · {vendor.location}
         </p>
@@ -29,9 +26,7 @@ function VendorCard({ vendor }: { vendor: Vendor }) {
 export default async function VendorsPage({ searchParams }: PageProps<"/vendors">) {
   const sp = await searchParams;
   const category = findVendorCategory(typeof sp.category === "string" ? sp.category : undefined);
-  const filtered = VENDORS.filter((v) => !category || v.category === category.slug).sort(
-    (a, b) => Number(b.featured) - Number(a.featured),
-  );
+  const filtered = VENDORS.filter((v) => !category || v.category === category.slug);
 
   return (
     <div className="space-y-4">
