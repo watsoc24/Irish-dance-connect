@@ -114,7 +114,10 @@ export default async function SchoolPage({ params }: PageProps<"/schools/[slug]"
           <ul className="space-y-2">
             {events.map((e) => (
               <li key={e.id} className="card text-sm">
-                <span className="font-medium">{e.name}</span> · {e.starts_on}{" "}
+                <Link href={`/feis/${e.id}`} className="link font-medium">
+                  {e.name}
+                </Link>{" "}
+                · {e.starts_on}{" "}
                 <a href={e.registration_url} target="_blank" rel="noopener noreferrer nofollow" className="link">
                   Register ↗
                 </a>

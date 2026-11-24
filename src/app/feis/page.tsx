@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { getAccount } from "@/lib/auth";
 import { searchTerm } from "@/lib/validation";
 import { IDTANA_REGIONS, findRegion, regionMatches } from "@/lib/idtana-regions";
+import { SITE_URL } from "@/lib/site";
+import { statesWithCounts } from "@/lib/states";
 import { JsonLd } from "@/components/json-ld";
 
 export const metadata: Metadata = {
@@ -56,8 +58,9 @@ export default async function FeisPage({ searchParams }: PageProps<"/feis">) {
   const hasFilter = Boolean(q || region || from);
 
   // Structured data for the unfiltered calendar only: an ItemList of the
-  // upcoming Events exactly as stored, with the organizer's registration
-  // page as each event's URL (feis events have no detail page here).
+  // upcoming Events exactly as stored, each pointing at its own detail
+  // page here (which carries the same Event data plus the registration
+  // link out to the organizer).
   const eventsJsonLd =
     !hasFilter && events.length
       ? {
@@ -88,7 +91,7 @@ export default async function FeisPage({ searchParams }: PageProps<"/feis">) {
                     },
                   }
                 : {}),
-              url: e.registration_url,
+              url: `${SITE_URL}/feis/${e.id}`,
             },
           })),
         }
@@ -160,7 +163,11 @@ export default async function FeisPage({ searchParams }: PageProps<"/feis">) {
             return (
               <li key={e.id} className="card space-y-1">
                 <p className="text-sm font-semibold text-brand-700">{formatRange(e.starts_on, e.ends_on)}</p>
-                <p className="text-lg font-semibold">{e.name}</p>
+                <p className="text-lg font-semibold">
+                  <Link href={`/feis/${e.id}`} className="link">
+                    {e.name}
+                  </Link>
+                </p>
                 <p className="text-sm text-gray-600">
                   {[e.venue_name, e.city, e.region, e.country].filter(Boolean).join(", ")}
                 </p>
@@ -190,6 +197,23 @@ export default async function FeisPage({ searchParams }: PageProps<"/feis">) {
         <Link href="/feis/submit" className="btn w-full">
           Submit a feis
         </Link>
+      ) : null}
+      {!hasFilter && events.length ? (
+        <section aria-label="Feiseanna by state">
+          <h2 className="mb-2 text-lg font-semibold">Feiseanna by state</h2>
+          <ul className="flex flex-wrap gap-2">
+            {statesWithCounts(events.map((e) => e.region)).map(({ state, count }) => (
+              <li key={state.slug}>
+                <Link
+                  href={`/feis/state/${state.slug}`}
+                  className="inline-flex min-h-11 items-center rounded-lg border border-line bg-cream px-3 py-2 text-sm font-semibold text-ink"
+                >
+                  {state.name} ({count})
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
       ) : null}
     </div>
   );

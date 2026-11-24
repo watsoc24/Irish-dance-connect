@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { searchTerm } from "@/lib/validation";
 import { formatMiles, lookupZip, normalizeZip, sortSchoolsByDistance } from "@/lib/geo";
+import { statesWithCounts } from "@/lib/states";
 
 export const metadata: Metadata = {
   title: "Find an Irish Dance School Near You",
@@ -145,6 +146,23 @@ export default async function SchoolsPage({ searchParams }: PageProps<"/schools"
           Add and verify your school
         </Link>
       </p>
+      {!q && !rawZip ? (
+        <section aria-label="Schools by state">
+          <h2 className="mb-2 text-lg font-semibold">Schools by state</h2>
+          <ul className="flex flex-wrap gap-2">
+            {statesWithCounts(schools.map((s) => s.region)).map(({ state, count }) => (
+              <li key={state.slug}>
+                <Link
+                  href={`/schools/state/${state.slug}`}
+                  className="inline-flex min-h-11 items-center rounded-lg border border-line bg-cream px-3 py-2 text-sm font-semibold text-ink"
+                >
+                  {state.name} ({count})
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
       {located ? (
         <p className="text-xs text-gray-500">
           ZIP lookup by <a href="https://www.zippopotam.us/" target="_blank" rel="noopener noreferrer nofollow" className="link">Zippopotam.us</a> (place data © GeoNames, CC BY).
