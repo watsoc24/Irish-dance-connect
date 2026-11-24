@@ -216,6 +216,17 @@ export const VENDORS: Vendor[] = [
     offers: ["Irish dance shoes (major brands)", "Poodle socks", "Wigs and accessories"],
     website: "https://www.keilys.com",
   },
+  {
+    name: "Gibson Irish Dance Imports",
+    slug: "gibson-irish-dance-imports",
+    category: "shoes",
+    location: "Thiensville, Wisconsin, USA",
+    blurb:
+      "A North American Irish dance shoe supplier owned and operated by an Irish dance mom: hard and soft shoes from 17 shoe lines for beginners through champions, plus socks, wigs and accessories, sold online and at feiseanna.",
+    offers: ["Hard and soft shoes (17 lines)", "Dance socks", "Wigs and accessories"],
+    website: "https://gibsonirishdanceimports.net",
+    instagram: "gibsonirishdanceimports",
+  },
 
   // ---- Wigs & hair ----
   {
