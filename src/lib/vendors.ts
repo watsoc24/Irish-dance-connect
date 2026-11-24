@@ -174,6 +174,17 @@ export const VENDORS: Vendor[] = [
     offers: ["Solo and team dresses", "Practice wear", "Custom headpieces", "Alterations"],
     website: "https://www.dancebling.com",
   },
+  {
+    name: "Gúna Rí Designs",
+    slug: "guna-ri-designs",
+    category: "dress-makers",
+    location: "Dublin, Ireland",
+    blurb:
+      "Family-run Dublin maker of bespoke Irish dance costumes, contemporary and traditional, designed with each dancer and couriered worldwide; measurements in person or over Zoom.",
+    offers: ["Bespoke solo dresses", "Team costumes", "Boys' outfits"],
+    website: "https://gunaridesigns.ie",
+    instagram: "guna_ri_designs",
+  },
 
   // ---- Shoes ----
   {
