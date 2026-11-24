@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Metronome } from "@/components/metronome";
+import { FundamentalsList } from "@/components/fundamentals-list";
+import { ConditioningVideos, TrainerLinks } from "@/components/conditioning-videos";
 import { getDance, getLevel, LEVELS, PRACTICE_ENTRIES, SOFTLEY_ARTIST_URL, TEMPO_CHART } from "@/lib/practice-music";
 
 export const metadata: Metadata = {
@@ -28,38 +30,21 @@ export default async function PracticePage({ searchParams }: PageProps<"/practic
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="page-title">Practice music</h1>
+        <h1 className="page-title">Practice</h1>
         <p className="text-gray-600">
-          Feis tempos, traditional tunes and a metronome for every dance and level (free, no sign-in needed). Pick
-          your level, choose a dance, and press start.
+          Everything for practice at home in one place, free and no sign-in needed: music at feis tempos with a
+          metronome, the fundamentals every dancer works on, and conditioning and stretching videos.
         </p>
       </div>
 
-      <section aria-label="More practice help">
-        <h2 className="mb-2 text-lg font-semibold">More practice help</h2>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Link href="/practice/fundamentals" className="card block space-y-1">
-            <h3 className="font-semibold">Fundamentals</h3>
-            <p className="text-sm text-gray-600">
-              Point, turn out, cross and arms: the four basics every dancer works on, with a simple drill for each.
-            </p>
-          </Link>
-          <Link href="/practice/conditioning" className="card block space-y-1">
-            <h3 className="font-semibold">Conditioning &amp; stretching</h3>
-            <p className="text-sm text-gray-600">
-              Follow-along conditioning and stretching videos from Irish dance trainers, for ankles, hips, core
-              and balance.
-            </p>
-          </Link>
-        </div>
-      </section>
+      <h2 className="text-xl font-bold">Music</h2>
 
       <div id="metronome">
         <Metronome initialDance={dance} initialLevel={level} initialBpm={initialBpm} />
       </div>
 
       <section className="card space-y-2" aria-label="Featured practice artist">
-        <h2 className="text-lg font-semibold">Recorded at feis tempo</h2>
+        <h3 className="text-lg font-semibold">Recorded at feis tempo</h3>
         <p className="text-sm text-gray-600">
           Sean Softley&apos;s tracks are recorded at the exact speeds dancers compete at: beginner reels at 122,
           championship reels at 113, light jigs at 115, heavy jigs at 73, and the traditional set dances. Where one
@@ -71,7 +56,7 @@ export default async function PracticePage({ searchParams }: PageProps<"/practic
       </section>
 
       <section aria-label="Choose your level">
-        <h2 className="mb-2 text-lg font-semibold">Your level</h2>
+        <h3 className="mb-2 text-lg font-semibold">Your level</h3>
         <ul className="flex flex-wrap gap-2">
           {LEVELS.map((l) => (
             <li key={l.slug}>
@@ -93,7 +78,7 @@ export default async function PracticePage({ searchParams }: PageProps<"/practic
       </section>
 
       <section aria-label="Tempos and tunes for your level">
-        <h2 className="mb-2 text-lg font-semibold">Tempos &amp; tunes: {levelName}</h2>
+        <h3 className="mb-2 text-lg font-semibold">Tempos &amp; tunes: {levelName}</h3>
         <ul className="space-y-3">
           {entries.map((entry) => {
             const danceInfo = getDance(entry.dance);
@@ -141,7 +126,7 @@ export default async function PracticePage({ searchParams }: PageProps<"/practic
       </section>
 
       <section aria-label="Feis tempo chart">
-        <h2 className="mb-2 text-lg font-semibold">Feis tempo chart</h2>
+        <h3 className="mb-2 text-lg font-semibold">Feis tempo chart</h3>
         <div className="card overflow-x-auto p-0">
           <table className="w-full min-w-[540px] text-sm">
             <thead>
@@ -183,6 +168,37 @@ export default async function PracticePage({ searchParams }: PageProps<"/practic
           for the hornpipe. Championships add an 8-bar introduction before the 48 bars (Reel, Treble Jig, Treble
           Reel) or 40 bars (Slip Jig, Hornpipe).
         </p>
+      </section>
+
+      <section className="space-y-4" aria-label="Fundamentals">
+        <h2 className="text-xl font-bold">Fundamentals</h2>
+        <p className="text-gray-600">
+          Four basics every Irish dancer works on: point, turn out, cross, and arms. These drills are simple,
+          beginner-level, and safe to do at home. Work through them slowly. Good habits built slowly last.
+        </p>
+        <p className="rounded-xl bg-brand-50 p-3 text-sm text-brand-900">
+          Safety note: stop if anything hurts, and ask your teacher if you are unsure about any of these. If a
+          movement causes pain, don&apos;t push through it.
+        </p>
+        <FundamentalsList />
+      </section>
+
+      <section className="space-y-4" aria-label="Conditioning and stretching">
+        <h2 className="text-xl font-bold">Conditioning &amp; stretching</h2>
+        <p className="text-gray-600">
+          Stronger ankles, hips and core muscles mean more height, better balance and control, and landings that
+          are kinder to your joints. Learn the exercises from a trainer instead of from text: the free teaching
+          videos below are from Target Training, and tapping one opens it on YouTube.
+        </p>
+        <p className="rounded-xl bg-brand-50 p-3 text-sm text-brand-900">
+          Before you start: warm up first with two or three minutes of marching, easy jogging on the spot or
+          gentle skipping, and follow the trainer&apos;s cues as you go. Stop straight away if anything hurts.
+          This is general information, not medical advice. If your dancer is injured, or pain keeps coming
+          back, talk to a doctor or physiotherapist, and check with your dance teacher before adding something
+          new.
+        </p>
+        <ConditioningVideos />
+        <TrainerLinks />
       </section>
 
       <section className="rounded-xl border border-line bg-brand-50 p-4" aria-label="Premium practice tracks coming soon">
