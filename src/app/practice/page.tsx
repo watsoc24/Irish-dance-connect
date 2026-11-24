@@ -35,6 +35,25 @@ export default async function PracticePage({ searchParams }: PageProps<"/practic
         </p>
       </div>
 
+      <section aria-label="More practice help">
+        <h2 className="mb-2 text-lg font-semibold">More practice help</h2>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Link href="/practice/fundamentals" className="card block space-y-1">
+            <h3 className="font-semibold">Fundamentals</h3>
+            <p className="text-sm text-gray-600">
+              Point, turn out, cross and arms: the four basics every dancer works on, with a simple drill for each.
+            </p>
+          </Link>
+          <Link href="/practice/conditioning" className="card block space-y-1">
+            <h3 className="font-semibold">Conditioning &amp; stretching</h3>
+            <p className="text-sm text-gray-600">
+              Follow-along conditioning and stretching videos from Irish dance trainers, for ankles, hips, core
+              and balance.
+            </p>
+          </Link>
+        </div>
+      </section>
+
       <div id="metronome">
         <Metronome initialDance={dance} initialLevel={level} initialBpm={initialBpm} />
       </div>
@@ -164,24 +183,6 @@ export default async function PracticePage({ searchParams }: PageProps<"/practic
           for the hornpipe. Championships add an 8-bar introduction before the 48 bars (Reel, Treble Jig, Treble
           Reel) or 40 bars (Slip Jig, Hornpipe).
         </p>
-      </section>
-
-      <section aria-label="More practice help">
-        <h2 className="mb-2 text-lg font-semibold">More practice help</h2>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Link href="/practice/fundamentals" className="card block space-y-1">
-            <h3 className="font-semibold">Fundamentals</h3>
-            <p className="text-sm text-gray-600">
-              Point, turn out, cross and arms: the four basics every dancer works on, with a simple drill for each.
-            </p>
-          </Link>
-          <Link href="/practice/conditioning" className="card block space-y-1">
-            <h3 className="font-semibold">Conditioning &amp; stretching</h3>
-            <p className="text-sm text-gray-600">
-              Light, beginner-safe exercises for ankles, hips, core and balance, plus gentle cool-down stretches.
-            </p>
-          </Link>
-        </div>
       </section>
 
       <section className="rounded-xl border border-line bg-brand-50 p-4" aria-label="Premium practice tracks coming soon">
